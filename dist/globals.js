@@ -585,15 +585,17 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 
 },{}],"9qcUd":[function(require,module,exports) {
 var _staggerHeading = require("./modules/staggerHeading");
+var _staggerText = require("./modules/staggerText");
 (0, _staggerHeading.setStaggerHeading)();
+(0, _staggerText.setStaggerText)();
 
-},{"./modules/staggerHeading":"kL2X7"}],"kL2X7":[function(require,module,exports) {
+},{"./modules/staggerHeading":"kL2X7","./modules/staggerText":"h1EYx"}],"kL2X7":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "setStaggerHeading", ()=>setStaggerHeading);
 var _createSVGGrid = require("./createSVGGrid");
 // Link timelines to scroll position
-function createScrollTrigger(triggerElement, start, end, withScroll) {
+function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
     const squares = triggerElement.querySelectorAll("rect");
     gsap.set(squares, {
         fill: "#000000"
@@ -607,12 +609,12 @@ function createScrollTrigger(triggerElement, start, end, withScroll) {
         trigger.onEnter = ()=>{
             gsap.to(squares, {
                 fill: "#ffffff",
+                delay: delay,
                 stagger: {
-                    amount: 0.3,
-                    from: "random",
-                    ease: "power2.inOut"
+                    each: 0.01,
+                    from: "random"
                 },
-                ease: "power4.Out"
+                ease: "bounce.out"
             });
         };
         gsap.timeline({
@@ -633,13 +635,8 @@ function setStaggerHeading() {
     const blocks = document.querySelectorAll("[stagger-heading]");
     blocks.forEach((el)=>{
         const maskEl = (0, _createSVGGrid.createSVGGrid)(el, 10);
-        // const wrapper = document.createElement("span");
-        // wrapper.classList.add("line-wrapper");
-        // line.parentNode.insertBefore(wrapper, line);
-        // wrapper.appendChild(line);
-        const startVal = el.dataset.startPos || "top top", endVal = el.dataset.endPos || "bottom center", withScrollTrigger = el.dataset.withScroll || false;
-        // let tl = gsap.timeline({ paused: true });
-        createScrollTrigger(maskEl, startVal, endVal, withScrollTrigger);
+        const startVal = el.dataset.startPos || "top top", endVal = el.dataset.endPos || "bottom center", delay = el.dataset.delay || 0, withScrollTrigger = el.dataset.withScroll || false;
+        createScrollTrigger(maskEl, startVal, endVal, delay, withScrollTrigger);
     });
 }
 
@@ -723,6 +720,75 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}]},["7vXoQ","9qcUd"], "9qcUd", "parcelRequire5744")
+},{}],"h1EYx":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "setStaggerText", ()=>setStaggerText);
+var _setLinesWrapper = require("./setLinesWrapper");
+// Link timelines to scroll position
+function createScrollTrigger(triggerElement, elements, start, end, stagger, delay, withScroll) {
+    const trigger = {
+        trigger: triggerElement,
+        scrub: true,
+        start
+    };
+    if (!withScroll) {
+        trigger.onEnter = ()=>{
+            gsap.to(elements, {
+                yPercent: 0,
+                stagger: stagger,
+                ease: "power4.out",
+                delay: Number(delay)
+            });
+        };
+        gsap.timeline({
+            scrollTrigger: trigger
+        });
+    } else {
+        trigger.end = end;
+        gsap.timeline({
+            scrollTrigger: trigger
+        }).to(words, {
+            yPercent: 0,
+            stagger: stagger,
+            ease: "none"
+        });
+    }
+}
+function setStaggerText() {
+    // Split all words on the brand core section
+    const staggerTextEls = new SplitType("[stagger-text]", {
+        types: "lines",
+        tagName: "span"
+    });
+    (0, _setLinesWrapper.setLinesWrapper)(staggerTextEls.lines, ()=>{
+        gsap.set("[stagger-text] .line", {
+            yPercent: 100
+        });
+    });
+    const textBlocks = document.querySelectorAll("[stagger-text]");
+    textBlocks.forEach((el)=>{
+        const words1 = el.querySelectorAll(".line"), startVal = el.dataset.startPos || "top top", endVal = el.dataset.endPos || "bottom center", stagger = el.dataset.stagger || 0.05, delay = el.dataset.delay || 0, withScrollTrigger = el.dataset.withScroll || false;
+        // let tl = gsap.timeline({ paused: true });
+        createScrollTrigger(el, words1, startVal, endVal, stagger, delay, withScrollTrigger);
+    });
+}
+
+},{"./setLinesWrapper":"hPUmk","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"hPUmk":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "setLinesWrapper", ()=>setLinesWrapper);
+function setLinesWrapper(lines, callback) {
+    // Wrap each line in a .line-wrapper span
+    lines.forEach((line)=>{
+        const wrapper = document.createElement("span");
+        wrapper.classList.add("line-wrapper");
+        line.parentNode.insertBefore(wrapper, line);
+        wrapper.appendChild(line);
+    });
+    if (typeof callback === "function") callback();
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["7vXoQ","9qcUd"], "9qcUd", "parcelRequire5744")
 
 //# sourceMappingURL=globals.js.map

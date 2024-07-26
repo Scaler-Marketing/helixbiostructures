@@ -593,8 +593,23 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "setHomeIntroText", ()=>setHomeIntroText);
 var _setLinesWrapper = require("../modules/setLinesWrapper");
 // Link timelines to scroll position
-function createHomeIntroText(triggerElement, words, isLast) {
-    if (!isLast) {
+function createHomeIntroText(triggerElement, words, index, amount) {
+    const isFirst = index === 0;
+    const isLast = index === amount - 1;
+    if (isFirst) gsap.fromTo(triggerElement.querySelector(".section-sticky"), {
+        opacity: 1
+    }, {
+        opacity: 0,
+        scrollTrigger: {
+            trigger: triggerElement,
+            scrub: true,
+            start: "80% bottom",
+            end: "bottom bottom",
+            markers: true,
+            pin: false
+        }
+    });
+    if (!isLast && !isFirst) {
         gsap.fromTo(words, {
             yPercent: 100
         }, {
@@ -624,7 +639,8 @@ function createHomeIntroText(triggerElement, words, isLast) {
                 pin: false
             }
         });
-    } else {
+    }
+    if (isLast) {
         const lines = triggerElement.querySelectorAll(".intro-text");
         const tl = gsap.timeline({
             paused: true
@@ -685,8 +701,7 @@ function setHomeIntroText() {
     const sections = document.querySelectorAll(".intro-sequence .sticky-wrapper");
     sections.forEach((section, i)=>{
         const words = section.querySelectorAll(".line");
-        const isLast = i === sections.length - 1;
-        createHomeIntroText(section, words, isLast);
+        createHomeIntroText(section, words, i, sections.length);
     });
 }
 

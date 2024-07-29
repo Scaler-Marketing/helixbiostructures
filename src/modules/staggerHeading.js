@@ -16,6 +16,7 @@ function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
       gsap.to(squares, {
         fill: "#ffffff",
         delay: delay,
+        duration: 0.01,
         stagger: {
           each: 0.01,
           from: "random",
@@ -31,9 +32,13 @@ function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
       .timeline({
         scrollTrigger: trigger,
       })
-      .to(words, {
-        yPercent: 0,
-        stagger: 0.02,
+      .to(squares, {
+        fill: "#ffffff",
+        duration: 0.01,
+        stagger: {
+          each: 0.01,
+          from: "random",
+        },
         ease: "none",
       });
   }

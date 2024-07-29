@@ -2,26 +2,28 @@ import { createSVGGrid } from "../modules/createSVGGrid";
 import { setLinesWrapper } from "../modules/setLinesWrapper";
 
 export function initSectionScroll() {
-  const wrapper = document.querySelector('.section.list-scroll'),
-    sections = wrapper.querySelectorAll('.sticky-wrapper'),
-    anchors = wrapper.querySelectorAll('.section-nav-item');
-  
+  const wrapper = document.querySelector(".section.list-scroll"),
+    sections = wrapper.querySelectorAll(".sticky-wrapper"),
+    anchors = wrapper.querySelectorAll(".section-nav-item");
+
   if (!sections) {
     return;
   }
-  
-  sections.forEach((section) => {
-    const id = section.attributes.id,
+
+  sections.forEach((section, i) => {
+    const id = section.querySelector('.section-anchor').id,
       title = section.querySelector("h2"),
       description = section.querySelector("p"),
       button = section.querySelector(".button"),
+      videoBg = wrapper.querySelector(`.section-scroll-video-bg[data-section-id="${id}"] video`),
       anchorLink = wrapper.querySelector(
         `.section-nav-item[data-target="${id}"]`
       );
-    
+
     let descriptionLines;
 
     const maskEl = createSVGGrid(title, 10);
+    const maskVideo = createSVGGrid(videoBg, 20);
     // Split all words on the brand core section
     const descriptionEls = new SplitType(description, {
       types: "lines",
@@ -30,107 +32,199 @@ export function initSectionScroll() {
 
     setLinesWrapper(descriptionEls.lines, () => {
       descriptionLines = description.querySelectorAll(".line");
-      gsap.set(descriptionLines, { yPercent: 100 });
     });
 
-    gsap.set(button, { yPercent: 100 });
-
-    setListSectionScroll(section, maskEl, descriptionLines, button, anchorLink);
+    setListSectionScroll(section, i === 0, i === sections.length -1, maskEl, maskVideo, descriptionLines, button, anchorLink);
   });
-
 }
 
-function setListSectionScroll(trigger, titleMaskEl, descriptionLines, button, anchorLink) {
-  const squares = titleMaskEl.querySelectorAll("rect");
+function setListSectionScroll(
+  trigger,
+  isFirst,
+  isLast,
+  titleMaskEl,
+  maskVideo,
+  descriptionLines,
+  button,
+  anchorLink
+) {
+  const squaresTitle = titleMaskEl.querySelectorAll("rect");
+  const squaresTitleTiming = squaresTitle.length * 0.01;
+  const squaresVideo = maskVideo.querySelectorAll("rect");
+  const squaresVideoTiming = squaresVideo.length * 0.005;
 
-  gsap.set(squares, { fill: "#000000" });
-  const tl = gsap.timeline({ paused: true });
+  if (!isFirst) {    
+    gsap.set(squaresTitle, { fill: "#000000" });
+    gsap.set(descriptionLines, { yPercent: 100 });
+    gsap.set(button, { yPercent: 105 });
+  } else {
+    gsap.set(squaresTitle, { fill: "#ffffff" });
+    gsap.set(squaresVideo, { fill: "#ffffff" });
+  }
+  const tlIn = gsap.timeline({ paused: true });
+  const tlOut = gsap.timeline({ paused: true });
 
-  tl.addLabel('in')
-    .to(
-    squares,
-    {
-      fill: "#ffffff",
+  if (!isFirst) {
+    tlIn
+      .to(
+        squaresTitle,
+        {
+          fill: "#ffffff",
+          duration: 0.01,
+          stagger: {
+            from: "random",
+            each: 0.01,
+          },
+          ease: "bounce.out",
+        },
+        0
+      )
+      .to(
+        descriptionLines,
+        {
+          yPercent: 0,
+          stagger: 0.02,
+          duration: 0.5,
+          ease: "power4.inOut",
+        },
+        // `-=${squaresVideoTiming}`
+        0
+      )
+      .to(
+        button,
+        {
+          yPercent: 0,
+          duration: 0.5,
+          ease: "power4.inOut",
+        },
+        // "-=0.5"
+        0
+      );
+  }
+
+  tlOut
+    .to(squaresTitle, {
+      fill: "#000",
+      duration: 0.01,
       stagger: {
         from: "random",
-        duration: 0.5,
+        each: 0.01,
       },
       ease: "bounce.out",
-    }
-  ).to(
-    descriptionLines,
-    {
-      yPercent: 0,
-      stagger: 0.02,
-      duration: 0.5,
-      ease: "power4.out"
-    },
-    "-=0.5"
-  ).to(
-    button,
-    {
-      yPercent: 0,
-      duration: 0.5,
-      ease: "power4.out"
-    },
-    "-=0.5"
-  );
-
-  tl.addLabel('out')
-    .to(squares, {
-    fill: "#000",
-    stagger: {
-      duration: 0.5,
-      from: "random",
-    },
-    ease: "bounce.out",
-  })
+    })
+    // .to(
+    //   squaresVideo,
+    //   {
+    //     fill: "#000",
+    //     duration: 0.005,
+    //     stagger: {
+    //       from: "random",
+    //       each: 0.005,
+    //     },
+    //     ease: "bounce.out",
+    //   },
+    //   0
+    // )
     .to(
       descriptionLines,
       {
         yPercent: -100,
         stagger: 0.02,
         duration: 0.5,
-        ease: "power4.out",
+        ease: "power4.inOut",
       },
-      "-=0.5"
+    // `-=${squaresVideoTiming}`
+      0
     )
     .to(
       button,
       {
-        yPercent: -100,
+        yPercent: -105,
         duration: 0.5,
-        ease: "power4.out",
+        ease: "power4.inOut",
       },
-      "-=0.5"
-  );
-  
-  tl.addLabel('end');
-
-  tl.addPause("out");
+      // "-=0.5"
+      0
+    );
 
   gsap.timeline({
     scrollTrigger: {
       trigger,
-      start: 'top top',
-      end: 'bottom bottom',
+      start: isFirst ? "top top" : "33.33% top",
+      end: isFirst? "50% top" : "66.66% top",
+      // markers: true,
       scrub: true,
+      pin: false,
       onEnter: () => {
-        console.log('onEnter');
-        tl.seek('in').play();
+        // console.log("onEnter");
+        if (!isFirst) {
+          tlIn.play();
+          gsap.to(
+            squaresVideo,
+            {
+              fill: "#ffffff",
+              duration: 0.005,
+              stagger: {
+                from: "random",
+                each: 0.005,
+              },
+              ease: "bounce.out",
+            });
+        }
+        anchorLink.classList.add('active');
       },
       onEnterBack: () => {
-        console.log('onEnterBack')
-        tl.seek('end').reverse();
+        // console.log('onEnterBack')
+        tlOut.reverse();
+        gsap.to(
+          squaresVideo,
+          {
+            fill: "#ffffff",
+            duration: 0.005,
+            stagger: {
+              from: "random",
+              each: 0.005,
+            },
+            ease: "bounce.out",
+          });        
+        anchorLink.classList.add("active");
       },
       onLeave: () => {
-        console.log("OnLeave");
-        tl.seek('out').play();
+        // console.log("OnLeave");
+        if (!isLast) {
+          tlOut.play();
+          gsap.to(
+            squaresVideo,
+            {
+              fill: "#000000",
+              duration: 0.005,
+              stagger: {
+                from: "random",
+                each: 0.005,
+              },
+              ease: "bounce.out",
+            });          
+          anchorLink.classList.remove("active");
+        }
       },
       onLeaveBack: () => {
-        console.log("OnLeaveBack");
-        tl.seek('end').reverse();
+        // console.log("OnLeaveBack");
+        if (!isFirst) {
+          tlIn.reverse();
+          gsap.to(
+            squaresVideo,
+            {
+              fill: "#000000",
+              duration: 0.005,
+              stagger: {
+                from: "random",
+                each: 0.005,
+              },
+              ease: "bounce.out",
+            });          
+          anchorLink.classList.remove("active");
+        }
       }
-    }
+    },
   });
 }

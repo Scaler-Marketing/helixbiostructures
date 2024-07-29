@@ -610,6 +610,7 @@ function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
             gsap.to(squares, {
                 fill: "#ffffff",
                 delay: delay,
+                duration: 0.01,
                 stagger: {
                     each: 0.01,
                     from: "random"
@@ -624,9 +625,13 @@ function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
         trigger.end = end;
         gsap.timeline({
             scrollTrigger: trigger
-        }).to(words, {
-            yPercent: 0,
-            stagger: 0.02,
+        }).to(squares, {
+            fill: "#ffffff",
+            duration: 0.01,
+            stagger: {
+                each: 0.01,
+                from: "random"
+            },
             ease: "none"
         });
     }
@@ -683,6 +688,8 @@ function createSVGGrid(container, squaresPerRow) {
     maskContainer.style.maskRepeat = "no-repeat";
     maskContainer.style.maskPosition = "center";
     maskContainer.style.maskSize = "100% 100%";
+    maskContainer.style.width = "100%";
+    maskContainer.style.height = "100%";
     // Append SVG to maskContainer
     maskContainer.innerHTML = svgContent;
     container.parentNode.insertBefore(maskContainer, container);

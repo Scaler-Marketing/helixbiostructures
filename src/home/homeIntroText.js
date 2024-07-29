@@ -1,4 +1,5 @@
 import { setLinesWrapper } from "../modules/setLinesWrapper";
+import { createSVGGrid } from "../modules/createSVGGrid";
 
 // Link timelines to scroll position
 function createHomeIntroText(triggerElement, words, index, amount) {
@@ -18,7 +19,7 @@ function createHomeIntroText(triggerElement, words, index, amount) {
           scrub: true,
           start: "80% bottom",
           end: "bottom bottom",
-          markers: true,
+          // markers: true,
           pin: false,
         },
       }
@@ -39,7 +40,7 @@ function createHomeIntroText(triggerElement, words, index, amount) {
           scrub: true,
           start: "top top",
           end: "30% top",
-          markers: true,
+          // markers: true,
           pin: false,
         },
       }
@@ -58,7 +59,7 @@ function createHomeIntroText(triggerElement, words, index, amount) {
           scrub: true,
           start: "80% bottom",
           end: "bottom bottom",
-          markers: true,
+          // markers: true,
           pin: false,
         },
       }
@@ -111,11 +112,38 @@ function createHomeIntroText(triggerElement, words, index, amount) {
           scrub: true,
           start: "top top",
           end: "30% top",
-          markers: true,
+          // markers: true,
           pin: false,
         },
       }
     );
+
+    // logic for fade out on scrub video
+    const canvasSquares = document.querySelectorAll('.section.home-hero svg rect');
+    gsap.set(canvasSquares, { fill: "#ffffff" });
+
+    gsap.fromTo(
+      canvasSquares,
+      {
+        fill: "#ffffff",
+      },
+      {
+        fill: "#000000",
+        stagger: {
+          each: 0.005,
+          from: "random"
+        },
+        scrollTrigger: {
+          trigger: triggerElement,
+          scrub: true,
+          start: "bottom bottom",
+          end: "bottom center",
+          // markers: true,
+          pin: false,
+        },
+      }
+    );
+
   }
 }
 
@@ -131,6 +159,9 @@ export function setHomeIntroText() {
   });
 
   const sections = document.querySelectorAll(".intro-sequence .sticky-wrapper");
+
+  // set logic for fade out on scrub video
+  createSVGGrid(document.querySelector('.section.home-hero canvas'), 20);
 
   sections.forEach((section, i) => {
     const words = section.querySelectorAll(".line");

@@ -45,6 +45,8 @@ export function createSVGGrid(container, squaresPerRow) {
   maskContainer.style.maskRepeat = "no-repeat";
   maskContainer.style.maskPosition = "center";
   maskContainer.style.maskSize = "100% 100%";
+  maskContainer.style.width = "100%";
+  maskContainer.style.height = "100%";
 
   // Append SVG to maskContainer
   maskContainer.innerHTML = svgContent;

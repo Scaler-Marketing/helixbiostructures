@@ -585,9 +585,11 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 
 },{}],"dVZgU":[function(require,module,exports) {
 var _homeIntroText = require("./home/homeIntroText");
+var _services = require("./home/services");
 (0, _homeIntroText.setHomeIntroText)();
+(0, _services.initSectionScroll)();
 
-},{"./home/homeIntroText":"5u6HL"}],"5u6HL":[function(require,module,exports) {
+},{"./home/homeIntroText":"5u6HL","./home/services":"8ztf4"}],"5u6HL":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "setHomeIntroText", ()=>setHomeIntroText);
@@ -750,6 +752,156 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}]},["kL51u","dVZgU"], "dVZgU", "parcelRequire5744")
+},{}],"8ztf4":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "initSectionScroll", ()=>initSectionScroll);
+var _createSVGGrid = require("../modules/createSVGGrid");
+var _setLinesWrapper = require("../modules/setLinesWrapper");
+function initSectionScroll() {
+    const wrapper = document.querySelector(".section.list-scroll"), sections = wrapper.querySelectorAll(".sticky-wrapper"), anchors = wrapper.querySelectorAll(".section-nav-item");
+    if (!sections) return;
+    sections.forEach((section)=>{
+        const id = section.attributes.id, title = section.querySelector("h2"), description = section.querySelector("p"), button = section.querySelector(".button"), anchorLink = wrapper.querySelector(`.section-nav-item[data-target="${id}"]`);
+        let descriptionLines;
+        const maskEl = (0, _createSVGGrid.createSVGGrid)(title, 10);
+        // Split all words on the brand core section
+        const descriptionEls = new SplitType(description, {
+            types: "lines",
+            tagName: "span"
+        });
+        (0, _setLinesWrapper.setLinesWrapper)(descriptionEls.lines, ()=>{
+            descriptionLines = description.querySelectorAll(".line");
+            gsap.set(descriptionLines, {
+                yPercent: 100
+            });
+        });
+        gsap.set(button, {
+            yPercent: 100
+        });
+        setListSectionScroll(section, maskEl, descriptionLines, button, anchorLink);
+    });
+}
+function setListSectionScroll(trigger, titleMaskEl, descriptionLines, button, anchorLink) {
+    const squares = titleMaskEl.querySelectorAll("rect");
+    gsap.set(squares, {
+        fill: "#000000"
+    });
+    const tl = gsap.timeline({
+        paused: true
+    });
+    tl.addLabel("in").to(squares, {
+        fill: "#ffffff",
+        stagger: {
+            from: "random",
+            duration: 0.5
+        },
+        ease: "bounce.out"
+    }).to(descriptionLines, {
+        yPercent: 0,
+        stagger: 0.02,
+        duration: 0.5,
+        ease: "power4.out"
+    }, "-=0.5").to(button, {
+        yPercent: 0,
+        duration: 0.5,
+        ease: "power4.out"
+    }, "-=0.5");
+    tl.addLabel("out").to(squares, {
+        fill: "#000",
+        stagger: {
+            duration: 0.5,
+            from: "random"
+        },
+        ease: "bounce.out"
+    }).to(descriptionLines, {
+        yPercent: -100,
+        stagger: 0.02,
+        duration: 0.5,
+        ease: "power4.out"
+    }, "-=0.5").to(button, {
+        yPercent: -100,
+        duration: 0.5,
+        ease: "power4.out"
+    }, "-=0.5");
+    tl.addLabel("end");
+    tl.addPause("out");
+    gsap.timeline({
+        scrollTrigger: {
+            trigger,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: true,
+            onEnter: ()=>{
+                console.log("onEnter");
+                tl.seek("in").play();
+            },
+            onEnterBack: ()=>{
+                console.log("onEnterBack");
+                tl.seek("end").reverse();
+            },
+            onLeave: ()=>{
+                console.log("OnLeave");
+                tl.seek("out").play();
+            },
+            onLeaveBack: ()=>{
+                console.log("OnLeaveBack");
+                tl.seek("end").reverse();
+            }
+        }
+    });
+}
+
+},{"../modules/createSVGGrid":"8Spds","../modules/setLinesWrapper":"hPUmk","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8Spds":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "createSVGGrid", ()=>createSVGGrid);
+function createSVGGrid(container, squaresPerRow) {
+    if (!container) {
+        console.error("Container not found");
+        return;
+    }
+    // Get the container's dimensions
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    // Calculate the size of each square
+    const squareSize = parseInt(containerWidth / squaresPerRow);
+    // Calculate the number of squares per column
+    const squaresPerColumn = Math.ceil(containerHeight / squareSize);
+    // Create a unique ID for the mask
+    const maskId = "mask-" + Math.random().toString(36).substr(2, 9);
+    // Create SVG content
+    let svgContent = `
+                <svg viewBox="0 0 ${containerWidth} ${containerHeight}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+                    <defs>
+                        <mask id="${maskId}">
+                            ${Array.from({
+        length: squaresPerColumn
+    }).map((_, row)=>Array.from({
+            length: squaresPerRow
+        }).map((_, col)=>{
+            const x = col * squareSize;
+            const y = row * squareSize;
+            return `<rect x="${x}" y="${y}" width="${squareSize + 1}" height="${squareSize + 1}"/>`;
+        }).join("")).join("")}
+                        </mask>
+                    </defs>
+                </svg>`;
+    // Create wrapper for the SVG and mask
+    const maskContainer = document.createElement("div");
+    maskContainer.className = "mask-container";
+    maskContainer.style.position = "relative";
+    maskContainer.style.maskImage = `url(#${maskId})`;
+    maskContainer.style.maskRepeat = "no-repeat";
+    maskContainer.style.maskPosition = "center";
+    maskContainer.style.maskSize = "100% 100%";
+    // Append SVG to maskContainer
+    maskContainer.innerHTML = svgContent;
+    container.parentNode.insertBefore(maskContainer, container);
+    maskContainer.appendChild(container);
+    return maskContainer.querySelector("svg");
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["kL51u","dVZgU"], "dVZgU", "parcelRequire5744")
 
 //# sourceMappingURL=home.js.map

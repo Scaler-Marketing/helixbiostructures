@@ -4,7 +4,7 @@ import { createSVGGrid } from "./createSVGGrid";
 function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
   const squares = triggerElement.querySelectorAll('rect');
 
-  gsap.set(squares, { fill: "#000000" });
+  gsap.set(squares, { opacity: 0 });
   const trigger = {
     trigger: triggerElement,
     scrub: true,
@@ -14,7 +14,7 @@ function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
   if (!withScroll) {
     trigger.onEnter = () => {
       gsap.to(squares, {
-        fill: "#ffffff",
+        opacity: 1,
         delay: delay,
         duration: 0.01,
         stagger: {
@@ -33,7 +33,7 @@ function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
         scrollTrigger: trigger,
       })
       .to(squares, {
-        fill: "#ffffff",
+        opacity: 1,
         duration: 0.01,
         stagger: {
           each: 0.01,

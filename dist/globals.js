@@ -600,7 +600,7 @@ var _createSVGGrid = require("./createSVGGrid");
 function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
     const squares = triggerElement.querySelectorAll("rect");
     gsap.set(squares, {
-        fill: "#000000"
+        opacity: 0
     });
     const trigger = {
         trigger: triggerElement,
@@ -610,7 +610,7 @@ function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
     if (!withScroll) {
         trigger.onEnter = ()=>{
             gsap.to(squares, {
-                fill: "#ffffff",
+                opacity: 1,
                 delay: delay,
                 duration: 0.01,
                 stagger: {
@@ -628,7 +628,7 @@ function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
         gsap.timeline({
             scrollTrigger: trigger
         }).to(squares, {
-            fill: "#ffffff",
+            opacity: 1,
             duration: 0.01,
             stagger: {
                 each: 0.01,
@@ -685,13 +685,13 @@ function createSVGGrid(container, squaresPerRow) {
     // Create wrapper for the SVG and mask
     const maskContainer = document.createElement("div");
     maskContainer.className = "mask-container";
-    maskContainer.style.position = "relative";
     maskContainer.style.maskImage = `url(#${maskId})`;
-    maskContainer.style.maskRepeat = "no-repeat";
-    maskContainer.style.maskPosition = "center";
-    maskContainer.style.maskSize = "100% 100%";
-    maskContainer.style.width = "100%";
-    maskContainer.style.height = "100%";
+    // maskContainer.style.position = "relative";
+    // maskContainer.style.maskRepeat = "no-repeat";
+    // maskContainer.style.maskPosition = "center";
+    // maskContainer.style.maskSize = "100% 100%";
+    // maskContainer.style.width = "100%";
+    // maskContainer.style.height = "100%";
     // Append SVG to maskContainer
     maskContainer.innerHTML = svgContent;
     container.parentNode.insertBefore(maskContainer, container);

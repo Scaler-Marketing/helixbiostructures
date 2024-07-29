@@ -691,12 +691,12 @@ function createHomeIntroText(triggerElement, words, index, amount) {
         // logic for fade out on scrub video
         const canvasSquares = document.querySelectorAll(".section.home-hero svg rect");
         gsap.set(canvasSquares, {
-            fill: "#ffffff"
+            opacity: 1
         });
         gsap.fromTo(canvasSquares, {
-            fill: "#ffffff"
+            opacity: 1
         }, {
-            fill: "#000000",
+            opacity: 0,
             stagger: {
                 each: 0.005,
                 from: "random"
@@ -815,13 +815,13 @@ function createSVGGrid(container, squaresPerRow) {
     // Create wrapper for the SVG and mask
     const maskContainer = document.createElement("div");
     maskContainer.className = "mask-container";
-    maskContainer.style.position = "relative";
     maskContainer.style.maskImage = `url(#${maskId})`;
-    maskContainer.style.maskRepeat = "no-repeat";
-    maskContainer.style.maskPosition = "center";
-    maskContainer.style.maskSize = "100% 100%";
-    maskContainer.style.width = "100%";
-    maskContainer.style.height = "100%";
+    // maskContainer.style.position = "relative";
+    // maskContainer.style.maskRepeat = "no-repeat";
+    // maskContainer.style.maskPosition = "center";
+    // maskContainer.style.maskSize = "100% 100%";
+    // maskContainer.style.width = "100%";
+    // maskContainer.style.height = "100%";
     // Append SVG to maskContainer
     maskContainer.innerHTML = svgContent;
     container.parentNode.insertBefore(maskContainer, container);
@@ -861,7 +861,10 @@ function setListSectionScroll(trigger, isFirst, isLast, titleMaskEl, maskVideo, 
     const squaresVideoTiming = squaresVideo.length * 0.005;
     if (!isFirst) {
         gsap.set(squaresTitle, {
-            fill: "#000000"
+            opacity: 0
+        });
+        gsap.set(squaresVideo, {
+            opacity: 0
         });
         gsap.set(descriptionLines, {
             yPercent: 100
@@ -871,10 +874,10 @@ function setListSectionScroll(trigger, isFirst, isLast, titleMaskEl, maskVideo, 
         });
     } else {
         gsap.set(squaresTitle, {
-            fill: "#ffffff"
+            opacity: 1
         });
         gsap.set(squaresVideo, {
-            fill: "#ffffff"
+            opacity: 0
         });
     }
     const tlIn = gsap.timeline({
@@ -884,7 +887,7 @@ function setListSectionScroll(trigger, isFirst, isLast, titleMaskEl, maskVideo, 
         paused: true
     });
     if (!isFirst) tlIn.to(squaresTitle, {
-        fill: "#ffffff",
+        opacity: 1,
         duration: 0.01,
         stagger: {
             from: "random",
@@ -904,7 +907,7 @@ function setListSectionScroll(trigger, isFirst, isLast, titleMaskEl, maskVideo, 
     }, // "-=0.5"
     0);
     tlOut.to(squaresTitle, {
-        fill: "#000",
+        opacity: 0,
         duration: 0.01,
         stagger: {
             from: "random",
@@ -946,31 +949,31 @@ function setListSectionScroll(trigger, isFirst, isLast, titleMaskEl, maskVideo, 
             pin: false,
             onEnter: ()=>{
                 // console.log("onEnter");
-                if (!isFirst) {
-                    tlIn.play();
-                    gsap.to(squaresVideo, {
-                        fill: "#ffffff",
-                        duration: 0.005,
-                        stagger: {
-                            from: "random",
-                            each: 0.005
-                        },
-                        ease: "bounce.out"
-                    });
-                }
+                gsap.to(squaresVideo, {
+                    opacity: 1,
+                    duration: 0.005,
+                    stagger: {
+                        from: "random",
+                        each: 0.005
+                    },
+                    ease: "bounce.out",
+                    immediateRender: true
+                });
+                if (!isFirst) tlIn.play();
                 anchorLink.classList.add("active");
             },
             onEnterBack: ()=>{
                 // console.log('onEnterBack')
                 tlOut.reverse();
                 gsap.to(squaresVideo, {
-                    fill: "#ffffff",
+                    opacity: 1,
                     duration: 0.005,
                     stagger: {
                         from: "random",
                         each: 0.005
                     },
-                    ease: "bounce.out"
+                    ease: "bounce.out",
+                    immediateRender: true
                 });
                 anchorLink.classList.add("active");
             },
@@ -979,13 +982,14 @@ function setListSectionScroll(trigger, isFirst, isLast, titleMaskEl, maskVideo, 
                 if (!isLast) {
                     tlOut.play();
                     gsap.to(squaresVideo, {
-                        fill: "#000000",
+                        opacity: 0,
                         duration: 0.005,
                         stagger: {
                             from: "random",
                             each: 0.005
                         },
-                        ease: "bounce.out"
+                        ease: "bounce.out",
+                        immediateRender: true
                     });
                     anchorLink.classList.remove("active");
                 }
@@ -995,13 +999,14 @@ function setListSectionScroll(trigger, isFirst, isLast, titleMaskEl, maskVideo, 
                 if (!isFirst) {
                     tlIn.reverse();
                     gsap.to(squaresVideo, {
-                        fill: "#000000",
+                        opacity: 0,
                         duration: 0.005,
                         stagger: {
                             from: "random",
                             each: 0.005
                         },
-                        ease: "bounce.out"
+                        ease: "bounce.out",
+                        immediateRender: true
                     });
                     anchorLink.classList.remove("active");
                 }

@@ -1,5 +1,5 @@
 export function playVideoOnScroll() {
-  const videos = document.querySelectorAll('video.bg-video');
+  const videos = document.querySelectorAll('video[play-onscroll]');
 
   if (!videos) {
     return;

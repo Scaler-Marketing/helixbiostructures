@@ -54,12 +54,13 @@ function setListSectionScroll(
   const squaresVideoTiming = squaresVideo.length * 0.005;
 
   if (!isFirst) {    
-    gsap.set(squaresTitle, { fill: "#000000" });
+    gsap.set(squaresTitle, { opacity: 0 });
+    gsap.set(squaresVideo, { opacity: 0 });
     gsap.set(descriptionLines, { yPercent: 100 });
     gsap.set(button, { yPercent: 105 });
   } else {
-    gsap.set(squaresTitle, { fill: "#ffffff" });
-    gsap.set(squaresVideo, { fill: "#ffffff" });
+    gsap.set(squaresTitle, { opacity: 1 });
+    gsap.set(squaresVideo, { opacity: 0 });
   }
   const tlIn = gsap.timeline({ paused: true });
   const tlOut = gsap.timeline({ paused: true });
@@ -69,7 +70,7 @@ function setListSectionScroll(
       .to(
         squaresTitle,
         {
-          fill: "#ffffff",
+          opacity: 1,
           duration: 0.01,
           stagger: {
             from: "random",
@@ -104,7 +105,7 @@ function setListSectionScroll(
 
   tlOut
     .to(squaresTitle, {
-      fill: "#000",
+      opacity: 0,
       duration: 0.01,
       stagger: {
         from: "random",
@@ -157,53 +158,52 @@ function setListSectionScroll(
       pin: false,
       onEnter: () => {
         // console.log("onEnter");
-        if (!isFirst) {
-          tlIn.play();
-          gsap.to(
-            squaresVideo,
-            {
-              fill: "#ffffff",
-              duration: 0.005,
-              stagger: {
-                from: "random",
-                each: 0.005,
-              },
-              ease: "bounce.out",
-            });
-        }
-        anchorLink.classList.add('active');
-      },
-      onEnterBack: () => {
-        // console.log('onEnterBack')
-        tlOut.reverse();
         gsap.to(
           squaresVideo,
           {
-            fill: "#ffffff",
+            opacity: 1,
             duration: 0.005,
             stagger: {
               from: "random",
               each: 0.005,
             },
             ease: "bounce.out",
-          });        
+            immediateRender: true,
+          });
+        if (!isFirst) {
+          tlIn.play();
+        }
+        anchorLink.classList.add('active');
+      },
+      onEnterBack: () => {
+        // console.log('onEnterBack')
+        tlOut.reverse();
+        gsap.to(squaresVideo, {
+          opacity: 1,
+          duration: 0.005,
+          stagger: {
+            from: "random",
+            each: 0.005,
+          },
+          ease: "bounce.out",
+          immediateRender: true,
+        });        
         anchorLink.classList.add("active");
       },
       onLeave: () => {
         // console.log("OnLeave");
         if (!isLast) {
           tlOut.play();
-          gsap.to(
-            squaresVideo,
-            {
-              fill: "#000000",
-              duration: 0.005,
-              stagger: {
-                from: "random",
-                each: 0.005,
-              },
-              ease: "bounce.out",
-            });          
+          gsap.to(squaresVideo, {
+            opacity: 0,
+            duration: 0.005,
+            stagger: {
+              from: "random",
+              each: 0.005,
+            },
+            ease: "bounce.out",
+            immediateRender: true,
+          });          
           anchorLink.classList.remove("active");
         }
       },
@@ -211,17 +211,16 @@ function setListSectionScroll(
         // console.log("OnLeaveBack");
         if (!isFirst) {
           tlIn.reverse();
-          gsap.to(
-            squaresVideo,
-            {
-              fill: "#000000",
-              duration: 0.005,
-              stagger: {
-                from: "random",
-                each: 0.005,
-              },
-              ease: "bounce.out",
-            });          
+          gsap.to(squaresVideo, {
+            opacity: 0,
+            duration: 0.005,
+            stagger: {
+              from: "random",
+              each: 0.005,
+            },
+            ease: "bounce.out",
+            immediateRender: true,
+          });          
           anchorLink.classList.remove("active");
         }
       }

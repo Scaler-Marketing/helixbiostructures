@@ -40,13 +40,13 @@ export function createSVGGrid(container, squaresPerRow) {
   // Create wrapper for the SVG and mask
   const maskContainer = document.createElement("div");
   maskContainer.className = "mask-container";
-  maskContainer.style.position = "relative";
   maskContainer.style.maskImage = `url(#${maskId})`;
-  maskContainer.style.maskRepeat = "no-repeat";
-  maskContainer.style.maskPosition = "center";
-  maskContainer.style.maskSize = "100% 100%";
-  maskContainer.style.width = "100%";
-  maskContainer.style.height = "100%";
+  // maskContainer.style.position = "relative";
+  // maskContainer.style.maskRepeat = "no-repeat";
+  // maskContainer.style.maskPosition = "center";
+  // maskContainer.style.maskSize = "100% 100%";
+  // maskContainer.style.width = "100%";
+  // maskContainer.style.height = "100%";
 
   // Append SVG to maskContainer
   maskContainer.innerHTML = svgContent;

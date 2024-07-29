@@ -120,15 +120,15 @@ function createHomeIntroText(triggerElement, words, index, amount) {
 
     // logic for fade out on scrub video
     const canvasSquares = document.querySelectorAll('.section.home-hero svg rect');
-    gsap.set(canvasSquares, { fill: "#ffffff" });
+    gsap.set(canvasSquares, { opacity: 1 });
 
     gsap.fromTo(
       canvasSquares,
       {
-        fill: "#ffffff",
+        opacity: 1,
       },
       {
-        fill: "#000000",
+        opacity: 0,
         stagger: {
           each: 0.005,
           from: "random"

@@ -586,10 +586,12 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 },{}],"9qcUd":[function(require,module,exports) {
 var _staggerHeading = require("./modules/staggerHeading");
 var _staggerText = require("./modules/staggerText");
+var _buttonStates = require("./modules/buttonStates");
 (0, _staggerHeading.setStaggerHeading)();
 (0, _staggerText.setStaggerText)();
+(0, _buttonStates.initButtonStates)();
 
-},{"./modules/staggerHeading":"kL2X7","./modules/staggerText":"h1EYx"}],"kL2X7":[function(require,module,exports) {
+},{"./modules/staggerHeading":"kL2X7","./modules/staggerText":"h1EYx","./modules/buttonStates":"lezKo"}],"kL2X7":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "setStaggerHeading", ()=>setStaggerHeading);
@@ -794,6 +796,46 @@ function setLinesWrapper(lines, callback) {
         wrapper.appendChild(line);
     });
     if (typeof callback === "function") callback();
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lezKo":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "initButtonStates", ()=>initButtonStates);
+function initButtonStates() {
+    const buttons = document.querySelectorAll(".button");
+    if (!buttons) return;
+    buttons.forEach((button)=>{
+        const buttonBg = button.querySelector(".button-bg");
+        gsap.set(buttonBg, {
+            yPercent: 100
+        });
+        button.addEventListener("mouseenter", ()=>{
+            gsap.to(buttonBg, {
+                yPercent: 0,
+                duration: 0.3,
+                ease: "expo.out"
+            });
+            const circles = button.querySelectorAll("svg circle");
+            if (circles) gsap.fromTo(button.querySelectorAll("svg circle"), {
+                opacity: 0
+            }, {
+                opacity: 1,
+                duration: 0.01,
+                stagger: {
+                    from: "random",
+                    each: 0.1
+                }
+            });
+        });
+        button.addEventListener("mouseleave", ()=>{
+            gsap.to(buttonBg, {
+                yPercent: 100,
+                duration: 0.3,
+                ease: "expo.out"
+            });
+        });
+    });
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["7vXoQ","9qcUd"], "9qcUd", "parcelRequire5744")

@@ -7,12 +7,29 @@ export function initButtonStates() {
 
   buttons.forEach((button) => {
     const buttonBg = button.querySelector(".button-bg");
+
+    // Split all words on the brand core section
+    const buttonLabel = new SplitType(
+      button.querySelector(".button-label-inner"),
+      {
+        types: "chars",
+        tagName: "span",
+      }
+    );
+
     gsap.set(buttonBg, { yPercent: 100 });
     button.addEventListener("mouseenter", () => {
       gsap.to(buttonBg, {
         yPercent: 0,
         duration: 0.3,
-        ease: "expo.out"
+        ease: "expo.out",
+      });
+      gsap.to(buttonLabel.chars, {
+        yPercent: -100,
+        stagger: 0.01,
+        duration: 0.3,
+        ease: "expo.out",
+        immediateRender: true,
       });
 
       const circles = button.querySelectorAll("svg circle");
@@ -40,6 +57,7 @@ export function initButtonStates() {
         duration: 0.3,
         ease: "expo.out",
       });
+      gsap.set(buttonLabel.chars, {yPercent: 0});
     });
   });
 }

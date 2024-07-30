@@ -587,11 +587,15 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 var _staggerHeading = require("./modules/staggerHeading");
 var _staggerText = require("./modules/staggerText");
 var _buttonStates = require("./modules/buttonStates");
+var _playVideoOnScroll = require("./modules/playVideoOnScroll");
+var _menus = require("./modules/menus");
+(0, _menus.initMenus)();
 (0, _staggerHeading.setStaggerHeading)();
 (0, _staggerText.setStaggerText)();
 (0, _buttonStates.initButtonStates)();
+(0, _playVideoOnScroll.playVideoOnScroll)();
 
-},{"./modules/staggerHeading":"kL2X7","./modules/staggerText":"h1EYx","./modules/buttonStates":"lezKo"}],"kL2X7":[function(require,module,exports) {
+},{"./modules/staggerHeading":"kL2X7","./modules/staggerText":"h1EYx","./modules/buttonStates":"lezKo","./modules/playVideoOnScroll":"gWHEb","./modules/menus":"drhda"}],"kL2X7":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "setStaggerHeading", ()=>setStaggerHeading);
@@ -807,6 +811,11 @@ function initButtonStates() {
     if (!buttons) return;
     buttons.forEach((button)=>{
         const buttonBg = button.querySelector(".button-bg");
+        // Split all words on the brand core section
+        const buttonLabel = new SplitType(button.querySelector(".button-label-inner"), {
+            types: "chars",
+            tagName: "span"
+        });
         gsap.set(buttonBg, {
             yPercent: 100
         });
@@ -815,6 +824,13 @@ function initButtonStates() {
                 yPercent: 0,
                 duration: 0.3,
                 ease: "expo.out"
+            });
+            gsap.to(buttonLabel.chars, {
+                yPercent: -100,
+                stagger: 0.01,
+                duration: 0.3,
+                ease: "expo.out",
+                immediateRender: true
             });
             const circles = button.querySelectorAll("svg circle");
             if (circles) gsap.fromTo(button.querySelectorAll("svg circle"), {
@@ -834,8 +850,136 @@ function initButtonStates() {
                 duration: 0.3,
                 ease: "expo.out"
             });
+            gsap.set(buttonLabel.chars, {
+                yPercent: 0
+            });
         });
     });
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gWHEb":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "playVideoOnScroll", ()=>playVideoOnScroll);
+function playVideoOnScroll() {
+    const videos = document.querySelectorAll("video[play-onscroll]");
+    if (!videos) return;
+    videos.forEach((video)=>{
+        const start = video.dataset.start || "top bottom";
+        const pauseOutside = video.dataset.pauseOutside === "true";
+        const rewind = video.dataset.rewind === "true";
+        const loop = video.dataset.loop === "true";
+        if (loop) video.loop = true;
+        let settings = {
+            trigger: video,
+            start: start,
+            onEnter: ()=>{
+                video.play();
+            }
+        };
+        if (pauseOutside) {
+            settings.onLeave = ()=>{
+                pauseOrRewind(video, rewind);
+            };
+            settings.onLeaveBack = ()=>{
+                pauseOrRewind(video, rewind);
+            };
+            settings.onEnterBack = ()=>{
+                console.log("play video");
+                video.play();
+            };
+        } else settings.once = true;
+        ScrollTrigger.create(settings);
+    });
+}
+function pauseOrRewind(video, rewind) {
+    video.pause();
+    if (rewind) video.currentTime = 0;
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"drhda":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "initMenus", ()=>initMenus);
+function initMenus() {
+    const nav = document.querySelector(".header .nav"), dropdowns = nav.querySelectorAll(".nav-dropdown-trigger-wrapper"), dropdownEl = nav.querySelector(".nav-dropdown-el"), dropdownInner = nav.querySelector(".nav-dropdown-el-inner");
+    gsap.set(dropdownInner.querySelectorAll("[data-menu]"), {
+        display: "none"
+    });
+    gsap.set(dropdownInner, {
+        height: "0rem"
+    });
+    let isHover = false;
+    dropdowns.forEach((dropdown)=>{
+        const id = dropdown.dataset.menu;
+        if (!id) return;
+        dropdown.addEventListener("mouseenter", (e)=>{
+            isHover = true;
+            const activeMenu = dropdownInner.querySelector(`[data-menu="${id}"]`);
+            dropdownEl.classList.add("active");
+            gsap.set(dropdownInner.querySelectorAll("[data-menu]"), {
+                display: "none"
+            });
+            gsap.set(activeMenu, {
+                display: "grid"
+            });
+            const activeHeight = getElementHeightInRem(activeMenu);
+            gsap.to(dropdownInner, {
+                height: `${activeHeight}rem`,
+                duration: 0.3,
+                ease: "expo.out"
+            });
+        });
+        nav.addEventListener("mouseleave", (e)=>{
+            if (!isMouseOverElement(nav, e)) gsap.to(dropdownInner, {
+                height: `0rem`,
+                duration: 0.3,
+                ease: "expo.out",
+                onComplete: ()=>{
+                    gsap.set(dropdownInner.querySelectorAll("[data-menu]"), {
+                        display: "none"
+                    });
+                    dropdownEl.classList.remove("active");
+                }
+            });
+        });
+    });
+}
+function isMouseOverElement(element, event) {
+    // Check if the mouse is over the specified element or its descendants
+    return element.contains(event.relatedTarget);
+}
+/**
+ * Converts a length value from any CSS unit to pixels.
+ * @param {string} value - The length value as a string (e.g., "2rem", "50px").
+ * @returns {number} - The length value in pixels.
+ */ function convertToPixels(value) {
+    // Create a temporary element to use the browser's rendering to convert the value to pixels
+    const tempElement = document.createElement("div");
+    tempElement.style.position = "absolute";
+    tempElement.style.visibility = "hidden";
+    tempElement.style.width = value;
+    document.body.appendChild(tempElement);
+    const pixelValue = parseFloat(window.getComputedStyle(tempElement).width);
+    document.body.removeChild(tempElement);
+    return pixelValue;
+}
+/**
+ * Calculates the height of an element in rem units.
+ * @param {HTMLElement} element - The target element.
+ * @returns {number} - The height of the element in rem units.
+ */ function getElementHeightInRem(element) {
+    if (!element) throw new Error("Element is required");
+    // Get the computed style of the element
+    const computedStyle = window.getComputedStyle(element);
+    // Get the height of the element in pixels
+    const heightInPixels = parseFloat(computedStyle.height);
+    // Get the font size of the root element (html) in rem units and convert it to pixels
+    const rootFontSizeInRem = window.getComputedStyle(document.documentElement).fontSize;
+    const rootFontSizeInPixels = convertToPixels(rootFontSizeInRem);
+    // Calculate height in rem units
+    const heightInRem = heightInPixels / rootFontSizeInPixels;
+    return heightInRem;
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["7vXoQ","9qcUd"], "9qcUd", "parcelRequire5744")

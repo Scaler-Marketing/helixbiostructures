@@ -594,7 +594,7 @@ function initTestimonials() {
     const wrapper = document.querySelector(".testimonials-wrapper"), sliderContent = wrapper.querySelectorAll(".testimonial-item .testimonial-content"), names = wrapper.querySelector(".testimonial-source-wrapper .testimonial-source-list"), companies = wrapper.querySelector(".testimonial-company-wrapper .testimonial-source-list"), nextButton = document.querySelector(".button.next"), prevButton = document.querySelector(".button.prev");
     const namesHeight = Number((0, _getHeight.getElementHeightInRem)(names.parentNode).toFixed(2));
     const companiesHeight = Number((0, _getHeight.getElementHeightInRem)(companies.parentNode).toFixed(2));
-    console.log(namesHeight, companiesHeight);
+    // console.log(namesHeight, companiesHeight);
     let currentIndex = 0;
     sliderContent.forEach((content)=>{
         (0, _createSVGGrid.createSVGGrid)(content, 10);
@@ -691,7 +691,7 @@ function transitionSlides(current, next, index, total, direction, names, namesHe
     });
     // names list
     const yNames = calculateYPosition(index, total, direction, namesHeight);
-    console.log(index, total, direction, yNames);
+    // console.log(index, total, direction, yNames);
     gsap.to(names, {
         y: `${yNames}rem`,
         duration: 0.5,
@@ -728,7 +728,7 @@ function calculateYPosition(index, total, direction, height) {
     return index * (-1 * height);
 }
 
-},{"./modules/createSVGGrid":"8Spds","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./modules/getHeight":"1eyAq"}],"8Spds":[function(require,module,exports) {
+},{"./modules/createSVGGrid":"8Spds","./modules/getHeight":"1eyAq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8Spds":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "createSVGGrid", ()=>createSVGGrid);

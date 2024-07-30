@@ -8,6 +8,7 @@ export function initButtonStates() {
   buttons.forEach((button) => {
     const buttonBg = button.querySelector(".button-bg");
     const buttonLabel = button.querySelector('.button-label-inner');
+    const isRounded = button.classList.contains('is-giga');
     let buttonLabelChars;
 
     if (buttonLabel) {
@@ -20,13 +21,29 @@ export function initButtonStates() {
       );
     }
 
-    gsap.set(buttonBg, { yPercent: 100 });
+    if (buttonBg) {
+      console.log(isRounded);
+      if (isRounded) {
+        gsap.set(buttonBg, { scale: 0 });
+      } else {
+        gsap.set(buttonBg, { yPercent: 100 });
+      }
+    }
     button.addEventListener("mouseenter", () => {
-      gsap.to(buttonBg, {
-        yPercent: 0,
-        duration: 0.3,
-        ease: "expo.out",
-      });
+      if (buttonBg) {
+        const animation = {
+          duration: 0.3,
+          ease: "expo.out",
+        };
+
+        if (!isRounded) {
+          animation.yPercent = 0;
+        } else {
+          animation.scale = 1;
+        }
+
+        gsap.to(buttonBg, animation);
+      }
       if (buttonLabel && buttonLabelChars) {
         gsap.to(buttonLabelChars.chars, {
           yPercent: -100,
@@ -57,11 +74,20 @@ export function initButtonStates() {
     });
 
     button.addEventListener("mouseleave", () => {
-      gsap.to(buttonBg, {
-        yPercent: 100,
-        duration: 0.3,
-        ease: "expo.out",
-      });
+      if (buttonBg) {
+        const animation = {
+          duration: 0.3,
+          ease: "expo.out",
+        };
+
+        if (!isRounded) {
+          animation.yPercent = 100;
+        } else {
+          animation.scale = 0;
+        }
+
+        gsap.to(buttonBg, animation);
+      }
 
       if (buttonLabel && buttonLabelChars) {
         gsap.set(buttonLabelChars.chars, { yPercent: 0 });

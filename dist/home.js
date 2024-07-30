@@ -587,11 +587,13 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 var _homeIntroText = require("./home/homeIntroText");
 var _services = require("./home/services");
 var _testimonials = require("./testimonials");
+var _newsSlider = require("./home/newsSlider");
 (0, _homeIntroText.setHomeIntroText)();
 (0, _services.initSectionScroll)();
 (0, _testimonials.initTestimonials)();
+(0, _newsSlider.initNewsSlider)();
 
-},{"./home/homeIntroText":"5u6HL","./home/services":"8ztf4","./testimonials":"2kpD5"}],"5u6HL":[function(require,module,exports) {
+},{"./home/homeIntroText":"5u6HL","./home/services":"8ztf4","./testimonials":"2kpD5","./home/newsSlider":"e191i"}],"5u6HL":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "setHomeIntroText", ()=>setHomeIntroText);
@@ -1028,7 +1030,7 @@ function initTestimonials() {
     const wrapper = document.querySelector(".testimonials-wrapper"), sliderContent = wrapper.querySelectorAll(".testimonial-item .testimonial-content"), names = wrapper.querySelector(".testimonial-source-wrapper .testimonial-source-list"), companies = wrapper.querySelector(".testimonial-company-wrapper .testimonial-source-list"), nextButton = document.querySelector(".button.next"), prevButton = document.querySelector(".button.prev");
     const namesHeight = Number((0, _getHeight.getElementHeightInRem)(names.parentNode).toFixed(2));
     const companiesHeight = Number((0, _getHeight.getElementHeightInRem)(companies.parentNode).toFixed(2));
-    console.log(namesHeight, companiesHeight);
+    // console.log(namesHeight, companiesHeight);
     let currentIndex = 0;
     sliderContent.forEach((content)=>{
         (0, _createSVGGrid.createSVGGrid)(content, 10);
@@ -1125,7 +1127,7 @@ function transitionSlides(current, next, index, total, direction, names, namesHe
     });
     // names list
     const yNames = calculateYPosition(index, total, direction, namesHeight);
-    console.log(index, total, direction, yNames);
+    // console.log(index, total, direction, yNames);
     gsap.to(names, {
         y: `${yNames}rem`,
         duration: 0.5,
@@ -1162,7 +1164,7 @@ function calculateYPosition(index, total, direction, height) {
     return index * (-1 * height);
 }
 
-},{"./modules/createSVGGrid":"8Spds","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./modules/getHeight":"1eyAq"}],"1eyAq":[function(require,module,exports) {
+},{"./modules/createSVGGrid":"8Spds","./modules/getHeight":"1eyAq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1eyAq":[function(require,module,exports) {
 /**
  * Converts a length value from any CSS unit to pixels.
  * @param {string} value - The length value as a string (e.g., "2rem", "50px").
@@ -1197,6 +1199,57 @@ function getElementHeightInRem(element) {
     // Calculate height in rem units
     const heightInRem = heightInPixels / rootFontSizeInPixels;
     return heightInRem;
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"e191i":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "initNewsSlider", ()=>initNewsSlider);
+function initNewsSlider() {
+    if (!document.querySelector(".news-slider")) return;
+    const sliders = document.querySelectorAll(".news-slider");
+    sliders.forEach((s)=>{
+        const slider = new Swiper(s, {
+            slidesPerView: "auto"
+        });
+        // gsap logic
+        const slides = s.querySelectorAll(".news-item");
+        gsap.set(slides, {
+            y: "3rem",
+            opacity: 0
+        });
+        gsap.timeline({
+            scrollTrigger: {
+                trigger: s,
+                start: "25% bottom",
+                onEnter: ()=>{
+                    gsap.to(slides, {
+                        y: "0rem",
+                        opacity: 1,
+                        stagger: 0.1,
+                        duration: 0.5,
+                        ease: "expo.out"
+                    });
+                }
+            }
+        });
+    // slides.forEach((slide) => {
+    //   const c01 = slide.querySelector('.news-item-thumb-img._02');
+    //   const c02 = slide.querySelector('.news-item-thumb-img._03');
+    //   const tl = gsap.timeline({ paused: true });
+    //   tl.to(c01, {
+    //     scale: .8,
+    //     duration: .3,
+    //     ease: "expo.inOut"
+    //   }).to(c02, {
+    //     scale: .6,
+    //     duration: .3,
+    //     ease: "expo.inOut"
+    //   }, "-=0.3");
+    //   slide.addEventListener('mouseover', () => { tl.play(); })
+    //   slide.addEventListener('mouseout', () => { tl.reverse(); })
+    // });
+    });
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["kL51u","dVZgU"], "dVZgU", "parcelRequire5744")

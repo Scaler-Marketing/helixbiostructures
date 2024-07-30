@@ -589,13 +589,17 @@ var _staggerText = require("./modules/staggerText");
 var _buttonStates = require("./modules/buttonStates");
 var _playVideoOnScroll = require("./modules/playVideoOnScroll");
 var _menus = require("./modules/menus");
+var _setImageMasks = require("./modules/setImageMasks");
+var _staggerElements = require("./modules/staggerElements");
 (0, _menus.initMenus)();
 (0, _staggerHeading.setStaggerHeading)();
 (0, _staggerText.setStaggerText)();
 (0, _buttonStates.initButtonStates)();
 (0, _playVideoOnScroll.playVideoOnScroll)();
+(0, _setImageMasks.setImageMasks)();
+(0, _staggerElements.setStaggerElements)();
 
-},{"./modules/staggerHeading":"kL2X7","./modules/staggerText":"h1EYx","./modules/buttonStates":"lezKo","./modules/playVideoOnScroll":"gWHEb","./modules/menus":"drhda"}],"kL2X7":[function(require,module,exports) {
+},{"./modules/staggerHeading":"kL2X7","./modules/staggerText":"h1EYx","./modules/buttonStates":"lezKo","./modules/playVideoOnScroll":"gWHEb","./modules/menus":"drhda","./modules/setImageMasks":"4hIA7","./modules/staggerElements":"aJF8f"}],"kL2X7":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "setStaggerHeading", ()=>setStaggerHeading);
@@ -812,20 +816,31 @@ function initButtonStates() {
     buttons.forEach((button)=>{
         const buttonBg = button.querySelector(".button-bg");
         const buttonLabel = button.querySelector(".button-label-inner");
+        const isRounded = button.classList.contains("is-giga");
         let buttonLabelChars;
         if (buttonLabel) buttonLabelChars = new SplitType(buttonLabel, {
             types: "chars",
             tagName: "span"
         });
-        gsap.set(buttonBg, {
-            yPercent: 100
-        });
-        button.addEventListener("mouseenter", ()=>{
-            gsap.to(buttonBg, {
-                yPercent: 0,
-                duration: 0.3,
-                ease: "expo.out"
+        if (buttonBg) {
+            console.log(isRounded);
+            if (isRounded) gsap.set(buttonBg, {
+                scale: 0
             });
+            else gsap.set(buttonBg, {
+                yPercent: 100
+            });
+        }
+        button.addEventListener("mouseenter", ()=>{
+            if (buttonBg) {
+                const animation = {
+                    duration: 0.3,
+                    ease: "expo.out"
+                };
+                if (!isRounded) animation.yPercent = 0;
+                else animation.scale = 1;
+                gsap.to(buttonBg, animation);
+            }
             if (buttonLabel && buttonLabelChars) gsap.to(buttonLabelChars.chars, {
                 yPercent: -100,
                 stagger: 0.01,
@@ -846,11 +861,15 @@ function initButtonStates() {
             });
         });
         button.addEventListener("mouseleave", ()=>{
-            gsap.to(buttonBg, {
-                yPercent: 100,
-                duration: 0.3,
-                ease: "expo.out"
-            });
+            if (buttonBg) {
+                const animation = {
+                    duration: 0.3,
+                    ease: "expo.out"
+                };
+                if (!isRounded) animation.yPercent = 100;
+                else animation.scale = 0;
+                gsap.to(buttonBg, animation);
+            }
             if (buttonLabel && buttonLabelChars) gsap.set(buttonLabelChars.chars, {
                 yPercent: 0
             });
@@ -987,6 +1006,77 @@ function getElementHeightInRem(element) {
     // Calculate height in rem units
     const heightInRem = heightInPixels / rootFontSizeInPixels;
     return heightInRem;
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4hIA7":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "setImageMasks", ()=>setImageMasks);
+function setImageMasks() {
+    const imageMasks = document.querySelectorAll(".image-mask");
+    if (!imageMasks) return;
+    imageMasks.forEach((el)=>{
+        if (el.classList.contains("diamond")) setDiamondMask(el);
+    });
+}
+function setDiamondMask(el) {
+    const start = el.dataset.startPos || "center bottom";
+    gsap.set(el, {
+        clipPath: "polygon(100% 0%, 100% 0%, 0% 100%, 0% 100%, 0% 100%, 100% 0%)"
+    });
+    gsap.timeline({
+        scrollTrigger: {
+            trigger: el,
+            scrub: true,
+            start,
+            onEnter: ()=>{
+                gsap.fromTo(el, {
+                    clipPath: "polygon(100% 0%, 100% 0%, 0% 100%, 0% 100%, 0% 100%, 100% 0%)"
+                }, {
+                    clipPath: "polygon(100% 0%, 60% 0%, 0% 60%, 0% 100%, 40% 100%, 100% 40%)",
+                    duration: 1,
+                    ease: "expo.out"
+                });
+            }
+        }
+    });
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"aJF8f":[function(require,module,exports) {
+// Link timelines to scroll position
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "setStaggerElements", ()=>setStaggerElements);
+function createScrollList(triggerElement, elements, start, stagger, delay) {
+    gsap.set(elements, {
+        yPercent: 100,
+        opacity: 0
+    });
+    gsap.timeline({
+        scrollTrigger: {
+            trigger: triggerElement,
+            scrub: true,
+            start,
+            onEnter: ()=>{
+                gsap.to(elements, {
+                    yPercent: 0,
+                    opacity: 1,
+                    stagger,
+                    ease: "power4.out",
+                    delay: Number(delay)
+                });
+            }
+        }
+    });
+}
+function setStaggerElements() {
+    const list = document.querySelectorAll("[stagger-list]");
+    if (!list) return;
+    list.forEach((el)=>{
+        const elements = el.querySelectorAll("[stagger-el]"), startVal = el.dataset.startPos || "top top", stagger = el.dataset.stagger || 0.05, delay = el.dataset.delay || 0;
+        if (!elements) return;
+        createScrollList(el, elements, startVal, stagger, delay);
+    });
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["7vXoQ","9qcUd"], "9qcUd", "parcelRequire5744")

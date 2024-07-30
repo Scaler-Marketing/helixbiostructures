@@ -13,7 +13,7 @@ export function initTestimonials() {
   const namesHeight = Number(getElementHeightInRem(names.parentNode).toFixed(2));
   const companiesHeight = Number(getElementHeightInRem(companies.parentNode).toFixed(2)); 
 
-  console.log(namesHeight, companiesHeight);
+  // console.log(namesHeight, companiesHeight);
   
   let currentIndex = 0;
 
@@ -192,7 +192,7 @@ function transitionSlides(current, next, index, total, direction, names, namesHe
 
   // names list
   const yNames = calculateYPosition(index, total, direction, namesHeight);
-  console.log(index, total, direction, yNames);
+  // console.log(index, total, direction, yNames);
   gsap.to(names, {
     y: `${yNames}rem`,
     duration: 0.5,

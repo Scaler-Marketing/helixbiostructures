@@ -22,7 +22,6 @@ export function initButtonStates() {
     }
 
     if (buttonBg) {
-      console.log(isRounded);
       if (isRounded) {
         gsap.set(buttonBg, { scale: 0 });
       } else {

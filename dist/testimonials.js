@@ -142,14 +142,14 @@
       this[globalName] = mainExports;
     }
   }
-})({"7vXoQ":[function(require,module,exports) {
+})({"kOLnE":[function(require,module,exports) {
 var global = arguments[3];
 var HMR_HOST = null;
 var HMR_PORT = 50619;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "d6ea1d42532a7575";
 var HMR_USE_SSE = false;
-module.bundle.HMR_BUNDLE_ID = "7381faf90d8ce6f6";
+module.bundle.HMR_BUNDLE_ID = "8f6a649db64d11d7";
 "use strict";
 /* global HMR_HOST, HMR_PORT, HMR_ENV_HASH, HMR_SECURE, HMR_USE_SSE, chrome, browser, __parcel__import__, __parcel__importScripts__, ServiceWorkerGlobalScope */ /*::
 import type {
@@ -583,75 +583,152 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
     });
 }
 
-},{}],"9qcUd":[function(require,module,exports) {
-var _staggerHeading = require("./modules/staggerHeading");
-var _staggerText = require("./modules/staggerText");
-var _buttonStates = require("./modules/buttonStates");
-var _playVideoOnScroll = require("./modules/playVideoOnScroll");
-var _menus = require("./modules/menus");
-(0, _menus.initMenus)();
-(0, _staggerHeading.setStaggerHeading)();
-(0, _staggerText.setStaggerText)();
-(0, _buttonStates.initButtonStates)();
-(0, _playVideoOnScroll.playVideoOnScroll)();
-
-},{"./modules/staggerHeading":"kL2X7","./modules/staggerText":"h1EYx","./modules/buttonStates":"lezKo","./modules/playVideoOnScroll":"gWHEb","./modules/menus":"drhda"}],"kL2X7":[function(require,module,exports) {
+},{}],"2kpD5":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "setStaggerHeading", ()=>setStaggerHeading);
-var _createSVGGrid = require("./createSVGGrid");
-// Link timelines to scroll position
-function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
-    const squares = triggerElement.querySelectorAll("rect");
-    gsap.set(squares, {
+parcelHelpers.export(exports, "initTestimonials", ()=>initTestimonials);
+var _createSVGGrid = require("./modules/createSVGGrid");
+var _getHeight = require("./modules/getHeight");
+function initTestimonials() {
+    // Variables
+    const wrapper = document.querySelector(".testimonials-wrapper"), sliderContent = wrapper.querySelectorAll(".testimonial-item .testimonial-content"), names = wrapper.querySelector(".testimonial-source-wrapper .testimonial-source-list"), companies = wrapper.querySelector(".testimonial-company-wrapper .testimonial-source-list"), nextButton = document.querySelector(".button.next"), prevButton = document.querySelector(".button.prev");
+    const namesHeight = Number((0, _getHeight.getElementHeightInRem)(names.parentNode).toFixed(2));
+    const companiesHeight = Number((0, _getHeight.getElementHeightInRem)(companies.parentNode).toFixed(2));
+    console.log(namesHeight, companiesHeight);
+    let currentIndex = 0;
+    sliderContent.forEach((content)=>{
+        (0, _createSVGGrid.createSVGGrid)(content, 10);
+    });
+    gsap.set(".testimonial-item svg rect", {
         opacity: 0
     });
-    const trigger = {
-        trigger: triggerElement,
-        scrub: true,
-        start
-    };
-    if (!withScroll) {
-        trigger.onEnter = ()=>{
-            gsap.to(squares, {
-                opacity: 1,
-                delay: delay,
-                duration: 0.01,
-                stagger: {
-                    each: 0.01,
-                    from: "random"
-                },
-                ease: "bounce.out"
-            });
-        };
-        gsap.timeline({
-            scrollTrigger: trigger
-        });
-    } else {
-        trigger.end = end;
-        gsap.timeline({
-            scrollTrigger: trigger
-        }).to(squares, {
-            opacity: 1,
-            duration: 0.01,
-            stagger: {
-                each: 0.01,
-                from: "random"
-            },
-            ease: "none"
-        });
-    }
-}
-function setStaggerHeading() {
-    const blocks = document.querySelectorAll("[stagger-heading]");
-    blocks.forEach((el)=>{
-        const maskEl = (0, _createSVGGrid.createSVGGrid)(el, 10);
-        const startVal = el.dataset.startPos || "top top", endVal = el.dataset.endPos || "bottom center", delay = el.dataset.delay || 0, withScrollTrigger = el.dataset.withScroll || false;
-        createScrollTrigger(maskEl, startVal, endVal, delay, withScrollTrigger);
+    gsap.set(".testimonial-item:first-child svg rect", {
+        opacity: 1
+    });
+    // clone last and first item from each name and company
+    const allNames = names.querySelectorAll(".testimonial-source"), firstName = allNames[0], firstNameClone = firstName.cloneNode(true), lastName = allNames[allNames.length - 1], lastNameClone = lastName.cloneNode(true);
+    names.insertBefore(lastNameClone, firstName);
+    names.append(firstNameClone);
+    // set styles
+    gsap.set(firstNameClone, {
+        position: "absolute",
+        top: "100%",
+        left: 0
+    });
+    gsap.set(lastNameClone, {
+        position: "absolute",
+        bottom: "100%",
+        left: 0
+    });
+    const allCompanies = companies.querySelectorAll(".testimonial-source"), firstCompany = allCompanies[0], firstCompanyClone = firstCompany.cloneNode(true), lastCompany = allCompanies[allCompanies.length - 1], lastCompanyClone = lastCompany.cloneNode(true);
+    companies.insertBefore(lastCompanyClone, firstCompany);
+    companies.append(firstCompanyClone);
+    // set styles
+    gsap.set(firstCompanyClone, {
+        position: "absolute",
+        top: "100%",
+        left: 0
+    });
+    gsap.set(lastCompanyClone, {
+        position: "absolute",
+        bottom: "100%",
+        left: 0
+    });
+    // Next button click
+    nextButton.addEventListener("click", ()=>{
+        let currentSlide = sliderContent[currentIndex];
+        if (currentIndex < sliderContent.length - 1) {
+            let nextSlide = sliderContent[currentIndex + 1];
+            transitionSlides(currentSlide, nextSlide, currentIndex + 1, sliderContent.length - 1, "next", names, namesHeight, companies, companiesHeight);
+            currentIndex++;
+        } else {
+            let nextSlide = sliderContent[0];
+            transitionSlides(currentSlide, nextSlide, 0, sliderContent.length - 1, "next", names, namesHeight, companies, companiesHeight);
+            currentIndex = 0;
+        }
+    });
+    // Prev button click
+    prevButton.addEventListener("click", ()=>{
+        let currentSlide = sliderContent[currentIndex];
+        if (currentIndex > 0) {
+            let prevSlide = sliderContent[currentIndex - 1];
+            transitionSlides(currentSlide, prevSlide, currentIndex - 1, sliderContent.length - 1, "prev", names, namesHeight, companies, companiesHeight);
+            currentIndex--;
+        } else {
+            let prevSlide = sliderContent[sliderContent.length - 1];
+            transitionSlides(currentSlide, prevSlide, sliderContent.length - 1, sliderContent.length - 1, "prev", names, namesHeight, companies, companiesHeight);
+            currentIndex = sliderContent.length - 1;
+        }
     });
 }
+function transitionSlides(current, next, index, total, direction, names, namesHeight, companies, companiesHeight) {
+    const currentSquares = current.parentNode.querySelectorAll("rect"), nextSquares = next.parentNode.querySelectorAll("rect");
+    // next slide
+    gsap.fromTo(nextSquares, {
+        opacity: 0
+    }, {
+        opacity: 1,
+        duration: 0.01,
+        stagger: {
+            each: 0.01,
+            // grid: "auto",
+            // from: "center"
+            from: "random"
+        }
+    });
+    // current slide
+    gsap.fromTo(currentSquares, {
+        opacity: 1
+    }, {
+        opacity: 0,
+        duration: 0.01,
+        stagger: {
+            each: 0.01,
+            // grid: "auto",
+            // from: "center"
+            from: "random"
+        }
+    });
+    // names list
+    const yNames = calculateYPosition(index, total, direction, namesHeight);
+    console.log(index, total, direction, yNames);
+    gsap.to(names, {
+        y: `${yNames}rem`,
+        duration: 0.5,
+        ease: "expo.out",
+        onComplete: ()=>{
+        // if (index === 0 && direction === "prev") {
+        //   gsap.set(names, { y: `${(total - 1) * 2}rem` });
+        // }
+        // if (index === total && direction === "next") {
+        //   gsap.set(names, { y: "0rem" });
+        // }
+        }
+    });
+    // companies list
+    const yCompanies = calculateYPosition(index, total, direction, companiesHeight);
+    gsap.to(companies, {
+        y: `${yCompanies}rem`,
+        duration: 0.5,
+        ease: "expo.out",
+        onComplete: ()=>{
+        // if (index === 0 && direction === "prev") {
+        //   gsap.set(names, { y: `${(total - 1) * companiesHeight}rem` });
+        // }
+        // if (index === total && direction === "next") {
+        //   gsap.set(names, { y: "0rem" });
+        // }
+        }
+    });
+}
+function calculateYPosition(index, total, direction, height) {
+    if (index === 0 && direction === "prev") return -1 * height;
+    if (index === total && direction === "next") return -1 * height * total;
+    const newIndex = direction === "next" ? index + 1 : index - 1;
+    return index * (-1 * height);
+}
 
-},{"./createSVGGrid":"8Spds","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8Spds":[function(require,module,exports) {
+},{"./modules/createSVGGrid":"8Spds","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./modules/getHeight":"1eyAq"}],"8Spds":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "createSVGGrid", ()=>createSVGGrid);
@@ -733,226 +810,7 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}],"h1EYx":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "setStaggerText", ()=>setStaggerText);
-var _setLinesWrapper = require("./setLinesWrapper");
-// Link timelines to scroll position
-function createScrollTrigger(triggerElement, elements, start, end, stagger, delay, withScroll) {
-    const trigger = {
-        trigger: triggerElement,
-        scrub: true,
-        start
-    };
-    if (!withScroll) {
-        trigger.onEnter = ()=>{
-            gsap.to(elements, {
-                yPercent: 0,
-                stagger: stagger,
-                ease: "power4.out",
-                delay: Number(delay)
-            });
-        };
-        gsap.timeline({
-            scrollTrigger: trigger
-        });
-    } else {
-        trigger.end = end;
-        gsap.timeline({
-            scrollTrigger: trigger
-        }).to(words, {
-            yPercent: 0,
-            stagger: stagger,
-            ease: "none"
-        });
-    }
-}
-function setStaggerText() {
-    // Split all words on the brand core section
-    const staggerTextEls = new SplitType("[stagger-text]", {
-        types: "lines",
-        tagName: "span"
-    });
-    (0, _setLinesWrapper.setLinesWrapper)(staggerTextEls.lines, ()=>{
-        gsap.set("[stagger-text] .line", {
-            yPercent: 100
-        });
-    });
-    const textBlocks = document.querySelectorAll("[stagger-text]");
-    textBlocks.forEach((el)=>{
-        const words1 = el.querySelectorAll(".line"), startVal = el.dataset.startPos || "top top", endVal = el.dataset.endPos || "bottom center", stagger = el.dataset.stagger || 0.05, delay = el.dataset.delay || 0, withScrollTrigger = el.dataset.withScroll || false;
-        // let tl = gsap.timeline({ paused: true });
-        createScrollTrigger(el, words1, startVal, endVal, stagger, delay, withScrollTrigger);
-    });
-}
-
-},{"./setLinesWrapper":"hPUmk","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"hPUmk":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "setLinesWrapper", ()=>setLinesWrapper);
-function setLinesWrapper(lines, callback) {
-    // Wrap each line in a .line-wrapper span
-    lines.forEach((line)=>{
-        const wrapper = document.createElement("span");
-        wrapper.classList.add("line-wrapper");
-        line.parentNode.insertBefore(wrapper, line);
-        wrapper.appendChild(line);
-    });
-    if (typeof callback === "function") callback();
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lezKo":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "initButtonStates", ()=>initButtonStates);
-function initButtonStates() {
-    const buttons = document.querySelectorAll(".button");
-    if (!buttons) return;
-    buttons.forEach((button)=>{
-        const buttonBg = button.querySelector(".button-bg");
-        const buttonLabel = button.querySelector(".button-label-inner");
-        let buttonLabelChars;
-        if (buttonLabel) buttonLabelChars = new SplitType(buttonLabel, {
-            types: "chars",
-            tagName: "span"
-        });
-        gsap.set(buttonBg, {
-            yPercent: 100
-        });
-        button.addEventListener("mouseenter", ()=>{
-            gsap.to(buttonBg, {
-                yPercent: 0,
-                duration: 0.3,
-                ease: "expo.out"
-            });
-            if (buttonLabel && buttonLabelChars) gsap.to(buttonLabelChars.chars, {
-                yPercent: -100,
-                stagger: 0.01,
-                duration: 0.3,
-                ease: "expo.out",
-                immediateRender: true
-            });
-            const circles = button.querySelectorAll("svg circle");
-            if (circles) gsap.fromTo(button.querySelectorAll("svg circle"), {
-                opacity: 0
-            }, {
-                opacity: 1,
-                duration: 0.01,
-                stagger: {
-                    from: "random",
-                    each: 0.1
-                }
-            });
-        });
-        button.addEventListener("mouseleave", ()=>{
-            gsap.to(buttonBg, {
-                yPercent: 100,
-                duration: 0.3,
-                ease: "expo.out"
-            });
-            if (buttonLabel && buttonLabelChars) gsap.set(buttonLabelChars.chars, {
-                yPercent: 0
-            });
-        });
-    });
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gWHEb":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "playVideoOnScroll", ()=>playVideoOnScroll);
-function playVideoOnScroll() {
-    const videos = document.querySelectorAll("video[play-onscroll]");
-    if (!videos) return;
-    videos.forEach((video)=>{
-        const start = video.dataset.start || "top bottom";
-        const pauseOutside = video.dataset.pauseOutside === "true";
-        const rewind = video.dataset.rewind === "true";
-        const loop = video.dataset.loop === "true";
-        if (loop) video.loop = true;
-        let settings = {
-            trigger: video,
-            start: start,
-            onEnter: ()=>{
-                video.play();
-            }
-        };
-        if (pauseOutside) {
-            settings.onLeave = ()=>{
-                pauseOrRewind(video, rewind);
-            };
-            settings.onLeaveBack = ()=>{
-                pauseOrRewind(video, rewind);
-            };
-            settings.onEnterBack = ()=>{
-                console.log("play video");
-                video.play();
-            };
-        } else settings.once = true;
-        ScrollTrigger.create(settings);
-    });
-}
-function pauseOrRewind(video, rewind) {
-    video.pause();
-    if (rewind) video.currentTime = 0;
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"drhda":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "initMenus", ()=>initMenus);
-var _getHeight = require("./getHeight");
-function initMenus() {
-    const nav = document.querySelector(".header .nav"), dropdowns = nav.querySelectorAll(".nav-dropdown-trigger-wrapper"), dropdownEl = nav.querySelector(".nav-dropdown-el"), dropdownInner = nav.querySelector(".nav-dropdown-el-inner");
-    gsap.set(dropdownInner.querySelectorAll("[data-menu]"), {
-        display: "none"
-    });
-    gsap.set(dropdownInner, {
-        height: "0rem"
-    });
-    let isHover = false;
-    dropdowns.forEach((dropdown)=>{
-        const id = dropdown.dataset.menu;
-        if (!id) return;
-        dropdown.addEventListener("mouseenter", (e)=>{
-            isHover = true;
-            const activeMenu = dropdownInner.querySelector(`[data-menu="${id}"]`);
-            dropdownEl.classList.add("active");
-            gsap.set(dropdownInner.querySelectorAll("[data-menu]"), {
-                display: "none"
-            });
-            gsap.set(activeMenu, {
-                display: "grid"
-            });
-            const activeHeight = (0, _getHeight.getElementHeightInRem)(activeMenu);
-            gsap.to(dropdownInner, {
-                height: `${activeHeight}rem`,
-                duration: 0.3,
-                ease: "expo.out"
-            });
-        });
-        nav.addEventListener("mouseleave", (e)=>{
-            if (!isMouseOverElement(nav, e)) gsap.to(dropdownInner, {
-                height: `0rem`,
-                duration: 0.3,
-                ease: "expo.out",
-                onComplete: ()=>{
-                    gsap.set(dropdownInner.querySelectorAll("[data-menu]"), {
-                        display: "none"
-                    });
-                    dropdownEl.classList.remove("active");
-                }
-            });
-        });
-    });
-}
-function isMouseOverElement(element, event) {
-    // Check if the mouse is over the specified element or its descendants
-    return element.contains(event.relatedTarget);
-}
-
-},{"./getHeight":"1eyAq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1eyAq":[function(require,module,exports) {
+},{}],"1eyAq":[function(require,module,exports) {
 /**
  * Converts a length value from any CSS unit to pixels.
  * @param {string} value - The length value as a string (e.g., "2rem", "50px").
@@ -989,6 +847,6 @@ function getElementHeightInRem(element) {
     return heightInRem;
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["7vXoQ","9qcUd"], "9qcUd", "parcelRequire5744")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["kOLnE","2kpD5"], "2kpD5", "parcelRequire5744")
 
-//# sourceMappingURL=globals.js.map
+//# sourceMappingURL=testimonials.js.map

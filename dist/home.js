@@ -586,10 +586,12 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 },{}],"dVZgU":[function(require,module,exports) {
 var _homeIntroText = require("./home/homeIntroText");
 var _services = require("./home/services");
+var _testimonials = require("./testimonials");
 (0, _homeIntroText.setHomeIntroText)();
 (0, _services.initSectionScroll)();
+(0, _testimonials.initTestimonials)();
 
-},{"./home/homeIntroText":"5u6HL","./home/services":"8ztf4"}],"5u6HL":[function(require,module,exports) {
+},{"./home/homeIntroText":"5u6HL","./home/services":"8ztf4","./testimonials":"2kpD5"}],"5u6HL":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "setHomeIntroText", ()=>setHomeIntroText);
@@ -1015,6 +1017,188 @@ function setListSectionScroll(trigger, isFirst, isLast, titleMaskEl, maskVideo, 
     });
 }
 
-},{"../modules/createSVGGrid":"8Spds","../modules/setLinesWrapper":"hPUmk","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["kL51u","dVZgU"], "dVZgU", "parcelRequire5744")
+},{"../modules/createSVGGrid":"8Spds","../modules/setLinesWrapper":"hPUmk","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2kpD5":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "initTestimonials", ()=>initTestimonials);
+var _createSVGGrid = require("./modules/createSVGGrid");
+var _getHeight = require("./modules/getHeight");
+function initTestimonials() {
+    // Variables
+    const wrapper = document.querySelector(".testimonials-wrapper"), sliderContent = wrapper.querySelectorAll(".testimonial-item .testimonial-content"), names = wrapper.querySelector(".testimonial-source-wrapper .testimonial-source-list"), companies = wrapper.querySelector(".testimonial-company-wrapper .testimonial-source-list"), nextButton = document.querySelector(".button.next"), prevButton = document.querySelector(".button.prev");
+    const namesHeight = Number((0, _getHeight.getElementHeightInRem)(names.parentNode).toFixed(2));
+    const companiesHeight = Number((0, _getHeight.getElementHeightInRem)(companies.parentNode).toFixed(2));
+    console.log(namesHeight, companiesHeight);
+    let currentIndex = 0;
+    sliderContent.forEach((content)=>{
+        (0, _createSVGGrid.createSVGGrid)(content, 10);
+    });
+    gsap.set(".testimonial-item svg rect", {
+        opacity: 0
+    });
+    gsap.set(".testimonial-item:first-child svg rect", {
+        opacity: 1
+    });
+    // clone last and first item from each name and company
+    const allNames = names.querySelectorAll(".testimonial-source"), firstName = allNames[0], firstNameClone = firstName.cloneNode(true), lastName = allNames[allNames.length - 1], lastNameClone = lastName.cloneNode(true);
+    names.insertBefore(lastNameClone, firstName);
+    names.append(firstNameClone);
+    // set styles
+    gsap.set(firstNameClone, {
+        position: "absolute",
+        top: "100%",
+        left: 0
+    });
+    gsap.set(lastNameClone, {
+        position: "absolute",
+        bottom: "100%",
+        left: 0
+    });
+    const allCompanies = companies.querySelectorAll(".testimonial-source"), firstCompany = allCompanies[0], firstCompanyClone = firstCompany.cloneNode(true), lastCompany = allCompanies[allCompanies.length - 1], lastCompanyClone = lastCompany.cloneNode(true);
+    companies.insertBefore(lastCompanyClone, firstCompany);
+    companies.append(firstCompanyClone);
+    // set styles
+    gsap.set(firstCompanyClone, {
+        position: "absolute",
+        top: "100%",
+        left: 0
+    });
+    gsap.set(lastCompanyClone, {
+        position: "absolute",
+        bottom: "100%",
+        left: 0
+    });
+    // Next button click
+    nextButton.addEventListener("click", ()=>{
+        let currentSlide = sliderContent[currentIndex];
+        if (currentIndex < sliderContent.length - 1) {
+            let nextSlide = sliderContent[currentIndex + 1];
+            transitionSlides(currentSlide, nextSlide, currentIndex + 1, sliderContent.length - 1, "next", names, namesHeight, companies, companiesHeight);
+            currentIndex++;
+        } else {
+            let nextSlide = sliderContent[0];
+            transitionSlides(currentSlide, nextSlide, 0, sliderContent.length - 1, "next", names, namesHeight, companies, companiesHeight);
+            currentIndex = 0;
+        }
+    });
+    // Prev button click
+    prevButton.addEventListener("click", ()=>{
+        let currentSlide = sliderContent[currentIndex];
+        if (currentIndex > 0) {
+            let prevSlide = sliderContent[currentIndex - 1];
+            transitionSlides(currentSlide, prevSlide, currentIndex - 1, sliderContent.length - 1, "prev", names, namesHeight, companies, companiesHeight);
+            currentIndex--;
+        } else {
+            let prevSlide = sliderContent[sliderContent.length - 1];
+            transitionSlides(currentSlide, prevSlide, sliderContent.length - 1, sliderContent.length - 1, "prev", names, namesHeight, companies, companiesHeight);
+            currentIndex = sliderContent.length - 1;
+        }
+    });
+}
+function transitionSlides(current, next, index, total, direction, names, namesHeight, companies, companiesHeight) {
+    const currentSquares = current.parentNode.querySelectorAll("rect"), nextSquares = next.parentNode.querySelectorAll("rect");
+    // next slide
+    gsap.fromTo(nextSquares, {
+        opacity: 0
+    }, {
+        opacity: 1,
+        duration: 0.01,
+        stagger: {
+            each: 0.01,
+            // grid: "auto",
+            // from: "center"
+            from: "random"
+        }
+    });
+    // current slide
+    gsap.fromTo(currentSquares, {
+        opacity: 1
+    }, {
+        opacity: 0,
+        duration: 0.01,
+        stagger: {
+            each: 0.01,
+            // grid: "auto",
+            // from: "center"
+            from: "random"
+        }
+    });
+    // names list
+    const yNames = calculateYPosition(index, total, direction, namesHeight);
+    console.log(index, total, direction, yNames);
+    gsap.to(names, {
+        y: `${yNames}rem`,
+        duration: 0.5,
+        ease: "expo.out",
+        onComplete: ()=>{
+        // if (index === 0 && direction === "prev") {
+        //   gsap.set(names, { y: `${(total - 1) * 2}rem` });
+        // }
+        // if (index === total && direction === "next") {
+        //   gsap.set(names, { y: "0rem" });
+        // }
+        }
+    });
+    // companies list
+    const yCompanies = calculateYPosition(index, total, direction, companiesHeight);
+    gsap.to(companies, {
+        y: `${yCompanies}rem`,
+        duration: 0.5,
+        ease: "expo.out",
+        onComplete: ()=>{
+        // if (index === 0 && direction === "prev") {
+        //   gsap.set(names, { y: `${(total - 1) * companiesHeight}rem` });
+        // }
+        // if (index === total && direction === "next") {
+        //   gsap.set(names, { y: "0rem" });
+        // }
+        }
+    });
+}
+function calculateYPosition(index, total, direction, height) {
+    if (index === 0 && direction === "prev") return -1 * height;
+    if (index === total && direction === "next") return -1 * height * total;
+    const newIndex = direction === "next" ? index + 1 : index - 1;
+    return index * (-1 * height);
+}
+
+},{"./modules/createSVGGrid":"8Spds","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./modules/getHeight":"1eyAq"}],"1eyAq":[function(require,module,exports) {
+/**
+ * Converts a length value from any CSS unit to pixels.
+ * @param {string} value - The length value as a string (e.g., "2rem", "50px").
+ * @returns {number} - The length value in pixels.
+ */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+/**
+ * Calculates the height of an element in rem units.
+ * @param {HTMLElement} element - The target element.
+ * @returns {number} - The height of the element in rem units.
+ */ parcelHelpers.export(exports, "getElementHeightInRem", ()=>getElementHeightInRem);
+function convertToPixels(value) {
+    // Create a temporary element to use the browser's rendering to convert the value to pixels
+    const tempElement = document.createElement("div");
+    tempElement.style.position = "absolute";
+    tempElement.style.visibility = "hidden";
+    tempElement.style.width = value;
+    document.body.appendChild(tempElement);
+    const pixelValue = parseFloat(window.getComputedStyle(tempElement).width);
+    document.body.removeChild(tempElement);
+    return pixelValue;
+}
+function getElementHeightInRem(element) {
+    if (!element) throw new Error("Element is required");
+    // Get the computed style of the element
+    const computedStyle = window.getComputedStyle(element);
+    // Get the height of the element in pixels
+    const heightInPixels = parseFloat(computedStyle.height);
+    // Get the font size of the root element (html) in rem units and convert it to pixels
+    const rootFontSizeInRem = window.getComputedStyle(document.documentElement).fontSize;
+    const rootFontSizeInPixels = convertToPixels(rootFontSizeInRem);
+    // Calculate height in rem units
+    const heightInRem = heightInPixels / rootFontSizeInPixels;
+    return heightInRem;
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["kL51u","dVZgU"], "dVZgU", "parcelRequire5744")
 
 //# sourceMappingURL=home.js.map

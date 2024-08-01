@@ -187,6 +187,8 @@ export function setHomeIntroText() {
   svgLoad.style.zIndex = 1;
   document.querySelector('.section.home-hero .bg-canvas-el').classList.add('init');
 
+  console.log(document.querySelector(".section.home-hero .bg-canvas-el"));
+
   gsap.to(svgLoad.querySelectorAll("rect"), {
     opacity: 0,
     duration: 0.005,

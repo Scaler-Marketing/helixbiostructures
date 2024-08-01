@@ -49,6 +49,7 @@ export function setStaggerHeading() {
 
   blocks.forEach((el) => {
     const maskEl = createSVGGrid(el, 10);
+    el.classList.add('init');
     const startVal = el.dataset.startPos || "top top",
       endVal = el.dataset.endPos || "bottom center",
       delay = el.dataset.delay || 0,

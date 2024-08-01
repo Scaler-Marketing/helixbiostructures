@@ -1,4 +1,4 @@
-export function createSVGGrid(container, squaresPerRow) {
+export function createSVGGrid(container, squaresPerRow, fill, onlyEmbed) {
   if (!container) {
     console.error("Container not found");
     return;
@@ -17,8 +17,9 @@ export function createSVGGrid(container, squaresPerRow) {
   // Create a unique ID for the mask
   const maskId = "mask-" + Math.random().toString(36).substr(2, 9);
 
-  // Create SVG content
-  let svgContent = `
+  if (!onlyEmbed) {
+    // Create SVG content
+    let svgContent = `
                 <svg viewBox="0 0 ${containerWidth} ${containerHeight}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
                     <defs>
                         <mask id="${maskId}">
@@ -28,7 +29,11 @@ export function createSVGGrid(container, squaresPerRow) {
                                   .map((_, col) => {
                                     const x = col * squareSize;
                                     const y = row * squareSize;
-                                    return `<rect x="${x}" y="${y}" width="${squareSize + 1}" height="${squareSize + 1}"/>`;
+                                    return `<rect x="${x}" y="${y}" width="${
+                                      squareSize + 1
+                                    }" height="${squareSize + 1}" fill="${
+                                      fill ? fill : "#000000"
+                                    }"/>`;
                                   })
                                   .join("")
                               )
@@ -36,23 +41,39 @@ export function createSVGGrid(container, squaresPerRow) {
                         </mask>
                     </defs>
                 </svg>`;
+    // Create wrapper for the SVG and mask
+    const maskContainer = document.createElement("div");
+    maskContainer.className = "mask-container";
+    maskContainer.style.maskImage = `url(#${maskId})`;
 
-  // Create wrapper for the SVG and mask
-  const maskContainer = document.createElement("div");
-  maskContainer.className = "mask-container";
-  maskContainer.style.maskImage = `url(#${maskId})`;
-  // maskContainer.style.position = "relative";
-  // maskContainer.style.maskRepeat = "no-repeat";
-  // maskContainer.style.maskPosition = "center";
-  // maskContainer.style.maskSize = "100% 100%";
-  // maskContainer.style.width = "100%";
-  // maskContainer.style.height = "100%";
+    // Append SVG to maskContainer
+    maskContainer.innerHTML = svgContent;
+    container.parentNode.insertBefore(maskContainer, container);
+    maskContainer.appendChild(container);
 
-  // Append SVG to maskContainer
-  maskContainer.innerHTML = svgContent;
-  container.parentNode.insertBefore(maskContainer, container);
+    return maskContainer.querySelector("svg");
+  } else {
+    // Create SVG content
+    let svgContent = `
+                <svg viewBox="0 0 ${containerWidth} ${containerHeight}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+                            ${Array.from({ length: squaresPerColumn })
+                              .map((_, row) =>
+                                Array.from({ length: squaresPerRow })
+                                  .map((_, col) => {
+                                    const x = col * squareSize;
+                                    const y = row * squareSize;
+                                    return `<rect x="${x}" y="${y}" width="${
+                                      squareSize + 1
+                                    }" height="${squareSize + 1}" fill="${
+                                      fill ? fill : "#000000"
+                                    }"/>`;
+                                  })
+                                  .join("")
+                              )
+                              .join("")}
+                </svg>`;
+    container.insertAdjacentHTML("beforeend", svgContent);
 
-  maskContainer.appendChild(container);
-
-  return maskContainer.querySelector('svg');
+    return svgContent;
+  }
 }

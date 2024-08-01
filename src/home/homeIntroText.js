@@ -8,7 +8,7 @@ function createHomeIntroText(triggerElement, words, index, amount) {
 
   if (isFirst) {
     gsap.fromTo(
-      triggerElement.querySelector('.section-sticky'),
+      triggerElement.querySelector(".section-sticky"),
       {
         opacity: 1,
       },
@@ -23,9 +23,9 @@ function createHomeIntroText(triggerElement, words, index, amount) {
           pin: false,
         },
       }
-    );    
+    );
   }
- 
+
   if (!isLast && !isFirst) {
     gsap.fromTo(
       words,
@@ -67,38 +67,48 @@ function createHomeIntroText(triggerElement, words, index, amount) {
   }
 
   if (isLast) {
-    const lines = triggerElement.querySelectorAll('.intro-text');
-    const tl = gsap.timeline({paused: true});
+    const lines = triggerElement.querySelectorAll(".intro-text");
+    const tl = gsap.timeline({ paused: true });
     lines.forEach((line, i) => {
       if (i === lines.length - 1) {
-        gsap.set(line.querySelectorAll('.line'), { yPercent: 0 });
-        tl
-          .fromTo(line, {
+        gsap.set(line.querySelectorAll(".line"), { yPercent: 0 });
+        tl.fromTo(
+          line,
+          {
             height: 0,
           },
           {
-            height: 'auto',
+            height: "auto",
             duration: 1,
             delay: 2,
-            ease: 'none'
-          });
+            ease: "none",
+          }
+        );
       } else {
-        tl.fromTo(line.querySelectorAll(".line"), {
-          yPercent: 100,
-        }, {
-          yPercent: 0,
-          duration: 1,
-          ease: "none"
-        });
+        tl.fromTo(
+          line.querySelectorAll(".line"),
+          {
+            yPercent: 100,
+          },
+          {
+            yPercent: 0,
+            duration: 1,
+            ease: "none",
+          }
+        );
       }
     });
 
-    tl.fromTo(triggerElement.querySelector('.button'), {
-      yPercent: 105,
-    }, {
-      yPercent: 0,
-      duration: 1
-    });
+    tl.fromTo(
+      triggerElement.querySelector(".button"),
+      {
+        yPercent: 105,
+      },
+      {
+        yPercent: 0,
+        duration: 1,
+      }
+    );
 
     gsap.fromTo(
       tl,
@@ -119,7 +129,9 @@ function createHomeIntroText(triggerElement, words, index, amount) {
     );
 
     // logic for fade out on scrub video
-    const canvasSquares = document.querySelectorAll('.section.home-hero svg rect');
+    const canvasSquares = document.querySelectorAll(
+      ".section.home-hero .mask-container svg rect"
+    );
     gsap.set(canvasSquares, { opacity: 1 });
 
     gsap.fromTo(
@@ -131,7 +143,7 @@ function createHomeIntroText(triggerElement, words, index, amount) {
         opacity: 0,
         stagger: {
           each: 0.005,
-          from: "random"
+          from: "random",
         },
         scrollTrigger: {
           trigger: triggerElement,
@@ -143,7 +155,6 @@ function createHomeIntroText(triggerElement, words, index, amount) {
         },
       }
     );
-
   }
 }
 
@@ -161,7 +172,29 @@ export function setHomeIntroText() {
   const sections = document.querySelectorAll(".intro-sequence .sticky-wrapper");
 
   // set logic for fade out on scrub video
-  createSVGGrid(document.querySelector('.section.home-hero canvas'), 20);
+  createSVGGrid(document.querySelector(".section.home-hero canvas"), 20);
+  createSVGGrid(
+    document.querySelector(".section.home-hero .bg-canvas"),
+    20,
+    "#0C0C0C",
+    true
+  );
+
+  const svgLoad = document.querySelector(
+    ".section.home-hero .bg-canvas > svg"
+  );
+
+  svgLoad.style.zIndex = 1;
+  document.querySelector('.section.home-hero .bg-canvas-el').classList.add('init');
+
+  gsap.to(svgLoad.querySelectorAll("rect"), {
+    opacity: 0,
+    duration: 0.005,
+    stagger: {
+      each: 0.005,
+      from: "random",
+    },
+  });
 
   sections.forEach((section, i) => {
     const words = section.querySelectorAll(".line");

@@ -146,13 +146,26 @@ function setListSectionScroll(
       },
       // "-=0.5"
       0
-    );
+  );
+  
+  let start, end;
+
+  if (isFirst) {
+    start = "top top";
+    end = "50% top";
+  } else if (isLast) {
+    start = "50% top";
+    end = "bottom bottom";
+  } else {
+    start = "33.33% top";
+    end = "66.66% top";
+  }
 
   gsap.timeline({
     scrollTrigger: {
       trigger,
-      start: isFirst ? "top top" : "33.33% top",
-      end: isFirst? "50% top" : "66.66% top",
+      start,
+      end,
       // markers: true,
       scrub: true,
       pin: false,

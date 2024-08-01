@@ -47,6 +47,7 @@ export function setStaggerText() {
   const textBlocks = document.querySelectorAll("[stagger-text]");
 
   textBlocks.forEach((el) => {
+    el.classList.add("init");
     const words = el.querySelectorAll(".line"),
       startVal = el.dataset.startPos || "top top",
       endVal = el.dataset.endPos || "bottom center",

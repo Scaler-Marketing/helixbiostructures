@@ -173,30 +173,8 @@ export function setHomeIntroText() {
 
   // set logic for fade out on scrub video
   createSVGGrid(document.querySelector(".section.home-hero canvas"), 20);
-  createSVGGrid(
-    document.querySelector(".section.home-hero .bg-canvas"),
-    20,
-    "#0C0C0C",
-    true
-  );
 
-  const svgLoad = document.querySelector(
-    ".section.home-hero .bg-canvas > svg"
-  );
-
-  svgLoad.style.zIndex = 1;
   document.querySelector('.section.home-hero .bg-canvas-el').classList.add('init');
-
-  console.log(document.querySelector(".section.home-hero .bg-canvas-el"));
-
-  gsap.to(svgLoad.querySelectorAll("rect"), {
-    opacity: 0,
-    duration: 0.005,
-    stagger: {
-      each: 0.005,
-      from: "random",
-    },
-  });
 
   sections.forEach((section, i) => {
     const words = section.querySelectorAll(".line");

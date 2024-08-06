@@ -1,3 +1,4 @@
+import { setLoadingStates } from "./modules/setLoadingStates";
 import { setStaggerHeading } from "./modules/staggerHeading";
 import { setStaggerText } from "./modules/staggerText";
 import { initButtonStates } from "./modules/buttonStates";
@@ -7,6 +8,7 @@ import { setImageMasks } from "./modules/setImageMasks";
 import { setStaggerElements } from "./modules/staggerElements";
 
 initMenus();
+setLoadingStates();
 setStaggerHeading();
 setStaggerText();
 initButtonStates();

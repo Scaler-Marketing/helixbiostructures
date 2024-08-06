@@ -8,8 +8,10 @@ export function createSVGGrid(container, squaresPerRow, fill, onlyEmbed) {
   const containerWidth = container.clientWidth;
   const containerHeight = container.clientHeight;
 
+  const responsiveSquares = window.innerWidth <= 991 ? (squaresPerRow / 2) : squaresPerRow;
+
   // Calculate the size of each square
-  const squareSize = parseInt(containerWidth / squaresPerRow);
+  const squareSize = parseInt(containerWidth / responsiveSquares);
 
   // Calculate the number of squares per column
   const squaresPerColumn = Math.ceil(containerHeight / squareSize);
@@ -25,7 +27,7 @@ export function createSVGGrid(container, squaresPerRow, fill, onlyEmbed) {
                         <mask id="${maskId}">
                             ${Array.from({ length: squaresPerColumn })
                               .map((_, row) =>
-                                Array.from({ length: squaresPerRow })
+                                Array.from({ length: responsiveSquares })
                                   .map((_, col) => {
                                     const x = col * squareSize;
                                     const y = row * squareSize;

@@ -23,7 +23,7 @@ export function initSectionScroll() {
     let descriptionLines;
 
     const maskEl = createSVGGrid(title, 10);
-    const maskVideo = createSVGGrid(videoBg, 20);
+    const maskVideo = createSVGGrid(videoBg, 10);
     // Split all words on the brand core section
     const descriptionEls = new SplitType(description, {
       types: "lines",

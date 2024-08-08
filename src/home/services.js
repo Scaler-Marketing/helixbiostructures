@@ -15,7 +15,7 @@ export function initSectionScroll() {
       title = section.querySelector("h2"),
       description = section.querySelector("p"),
       button = section.querySelector(".button"),
-      videoBg = wrapper.querySelector(`.section-scroll-video-bg[data-section-id="${id}"] video`),
+      videoBg = wrapper.querySelector(`.section-scroll-video-bg[data-section-id="${id}"]`),
       anchorLink = wrapper.querySelector(
         `.section-nav-item[data-target="${id}"]`
       );

@@ -1,5 +1,5 @@
 export function playVideoOnScroll() {
-  const videos = document.querySelectorAll('video[play-onscroll]');
+  const videos = document.querySelectorAll('video[data-play-onscroll]');
 
   if (!videos) {
     return;
@@ -40,4 +40,34 @@ function pauseOrRewind(video, rewind) {
   if (rewind) {
     video.currentTime = 0;
   }
+}
+
+// Function to check if the browser is Safari
+function isSafari() {
+  return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+}
+
+export function setTransparentVideo() {
+  const videos = document.querySelectorAll("video.transparent-video");
+
+  if (!videos) {
+    return;
+  }
+
+  videos.forEach((video) => {
+    if (isSafari()) {
+      const webM = video.querySelector('source[format="video/webm"]');
+
+      if (webM) {
+        webM.remove();
+      }
+    } else {
+      const mp4 = video.querySelector('source[format="video/mp4"]');
+
+      if (mp4) {
+        mp4.remove();
+      }
+
+    }
+  });
 }

@@ -9,10 +9,13 @@ import { setStaggerElements } from "./modules/staggerElements";
 
 initMenus();
 setLoadingStates();
-setStaggerHeading();
-setStaggerText();
 initButtonStates();
 playVideoOnScroll();
 setTransparentVideo();
 setImageMasks();
 setStaggerElements();
+
+document.fonts.ready.then(() => {
+  setStaggerText();
+  setStaggerHeading();
+});

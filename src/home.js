@@ -3,7 +3,9 @@ import { initSectionScroll } from "./home/services";
 import { initTestimonials } from "./testimonials";
 import { initNewsSlider } from "./home/newsSlider";
 
-setHomeIntroText();
-initSectionScroll();
-initTestimonials();
+document.fonts.ready.then(() => {
+  setHomeIntroText();
+  initSectionScroll();
+  initTestimonials();
+});
 initNewsSlider();

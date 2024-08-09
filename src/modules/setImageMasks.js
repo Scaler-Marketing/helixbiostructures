@@ -22,6 +22,7 @@ function setDiamondMask(el) {
       trigger: el,
       scrub: true,
       start,
+      once: true,
       onEnter: () => {
         gsap.fromTo(
           el,

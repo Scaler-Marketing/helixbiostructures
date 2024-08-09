@@ -10,6 +10,7 @@ export function playVideoOnScroll() {
     const pauseOutside = video.dataset.pauseOutside === 'true';
     const rewind = video.dataset.rewind === 'true';
     const loop = video.dataset.loop === 'true';
+    video.pause();
 
     if (loop) {
       video.loop = true;
@@ -55,19 +56,26 @@ export function setTransparentVideo() {
   }
 
   videos.forEach((video) => {
+    const webM = video.querySelector('source[type="video/webm"]');
+    const mp4 = video.querySelector('source[type="video/mp4"]');
+    let formatFound;
     if (isSafari()) {
-      const webM = video.querySelector('source[format="video/webm"]');
-
       if (webM) {
         webM.remove();
       }
+      mp4.src = mp4.dataset.src;
+      formatFound = true;
     } else {
-      const mp4 = video.querySelector('source[format="video/mp4"]');
-
       if (mp4) {
         mp4.remove();
       }
+      
+      webM.src = webM.dataset.src;
+      formatFound = true;
+    }
 
+    if (formatFound) {
+      video.load();
     }
   });
 }

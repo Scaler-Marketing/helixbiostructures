@@ -49,7 +49,7 @@ export function setStaggerText() {
   textBlocks.forEach((el) => {
     el.classList.add("init");
     const words = el.querySelectorAll(".line"),
-      startVal = el.dataset.startPos || "top top",
+      startVal = el.dataset.startPos || "center bottom",
       endVal = el.dataset.endPos || "bottom center",
       stagger = el.dataset.stagger || 0.05,
       delay = el.dataset.delay || 0,

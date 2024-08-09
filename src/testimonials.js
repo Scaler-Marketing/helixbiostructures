@@ -1,7 +1,7 @@
 import { createSVGGrid } from "./modules/createSVGGrid";
 import { getElementHeightInRem } from "./modules/getHeight";
 
-export function initTestimonials() {
+function initTestimonials() {
   // Variables
   const wrapper = document.querySelector('.testimonials-wrapper'),
     sliderContent = wrapper.querySelectorAll(".testimonial-item .testimonial-content"),
@@ -239,3 +239,7 @@ function calculateYPosition(index, total, direction, height) {
 
   return (index * (-1 * height));
 }
+
+document.fonts.ready.then(() => {
+  initTestimonials();
+});

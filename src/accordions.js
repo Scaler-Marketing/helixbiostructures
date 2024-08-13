@@ -23,7 +23,7 @@ function initAccordion(accordion) {
       wrapper = item.querySelector(".accordion-item-content");
     
     const titleEl = new SplitType(title, {
-      types: "chars",
+      types: "words, chars",
       tagName: "span",
     });
 

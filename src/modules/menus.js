@@ -99,15 +99,16 @@ export function initMenus() {
   });
 
   mm.add("(max-width: 991px)", () => {
-    console.log("mobile");
 
     const nav = document.querySelector(".header .nav"),
-      mobileTrigger = document.querySelector(".mobile-trigger");
-    dropdowns = nav.querySelectorAll(".nav-dropdown-trigger-wrapper"),
+      mobileTrigger = document.querySelector(".mobile-trigger"),
+      mobileOverlay = document.querySelector(".submenu-overlay"),
+      dropdowns = nav.querySelectorAll(".nav-dropdown-trigger-wrapper");
     // dropdownEl = nav.querySelector(".nav-dropdown-el.desktop"),
     // dropdownInner = dropdownEl.querySelector(".nav-dropdown-el-inner");
 
-    gsap.set(nav, { height: 0 });    
+    gsap.set(nav, { height: 0 });
+    gsap.set(mobileOverlay, { opacity: 0, backdropFilter: "blur(0px)" });
     const mobileTriggerTl = gsap.timeline({ paused: true });
 
     mobileTriggerTl
@@ -136,13 +137,33 @@ export function initMenus() {
           height: 0,
           ease: "expo.out",
         });
-        setAllDropdownOffStates(dropdowns);        
+        setAllDropdownOffStates(dropdowns);
+
+        gsap.to(mobileOverlay, {
+          opacity: 0,
+          backdropFilter: "blur(0px)",
+          duration: 0.5,
+          ease: "expo.out",
+          onComplete: () => {
+            gsap.set(mobileOverlay, { display: "none" });
+          }
+        });
+        
       } else {
         mobileTriggerTl.play();
         gsap.to(nav, {
           height: "auto",
           ease: "expo.out"
         });
+        gsap.set(mobileOverlay, { display: "block" });
+        gsap.to(mobileOverlay,
+          {
+            opacity: 1,
+            backdropFilter: "blur(24px)",
+            duration: 0.5,
+            ease: "expo.out"
+          }
+        )
       }
 
       mobileTrigger.classList.toggle("active");

@@ -4,9 +4,8 @@ import { setLinesWrapper } from "../modules/setLinesWrapper";
 export function initServicesSectionScroll() {
   const wrapper = document.querySelector(".section.list-scroll"),
     sections = wrapper.querySelectorAll(".sticky-wrapper"),
-    anchors = wrapper.querySelectorAll(".section-nav-item"),
     numbers = wrapper.querySelector(".scroll-list-numbers-inner"),
-    numbersLength = numbers.querySelectorAll('div').length;
+    numbersLength = numbers ? numbers.querySelectorAll("div").length : null;
 
   if (!sections) {
     return;
@@ -14,25 +13,7 @@ export function initServicesSectionScroll() {
 
   let currentIndex = 0;
 
-  sections.forEach((section, i) => {
-    // const id = section.querySelector('.section-anchor').id;
-    const title = section.querySelector("h2"),
-      description = section.querySelector("p");
-
-    let descriptionLines;
-
-    const maskEl = createSVGGrid(title, 10);
-    const descriptionEls = new SplitType(description, {
-      types: "lines",
-      tagName: "span",
-    });
-
-    setLinesWrapper(descriptionEls.lines, () => {
-      descriptionLines = description.querySelectorAll(".line");
-    });
-
-    setListSectionScroll(section, i === 0, i === sections.length - 1, maskEl, descriptionLines, () => {
-      console.log('numbersCallback', i, currentIndex);
+  function updateNumbers(i) {
       if (currentIndex !== i) {
         gsap.to(numbers, {
           yPercent: Number((100 / numbersLength).toFixed(2)) * -i,
@@ -42,33 +23,103 @@ export function initServicesSectionScroll() {
 
         currentIndex = i;
       }
+  }
+
+  sections.forEach((section, i) => {
+    const id = section.querySelector('.section-anchor').id;
+    const title = section.querySelector(".section-scroll-title > *"),
+      descriptionEl = section.querySelector(".section-scroll-description"),
+      descriptionType = descriptionEl.classList.contains("is-masked") ? 'html': 'text',
+      anchorLink = wrapper.querySelector(
+        `.section-nav-item[data-target="${id}"]`
+      );
+
+    let titleMaskEl, description;
+
+    if (title && descriptionType !== 'html') {
+      titleMaskEl = createSVGGrid(title, 10);
+    }
+
+    if (descriptionType === 'html') {
+      description = createSVGGrid(descriptionEl.querySelector('div'), 10);
+    } else {
+      descriptionInner = descriptionEl.querySelector("p");
+      if (descriptionInner) {
+        const descriptionEls = new SplitType(descriptionInner, {
+          types: "lines",
+          tagName: "span",
+        });
+
+        setLinesWrapper(descriptionEls.lines, () => {
+          description = descriptionInner.querySelectorAll(".line");
+        });
+      }
+    }
+
+    setListSectionScroll({
+      trigger: section,
+      isFirst: i === 0,
+      isLast: i === sections.length - 1,
+      titleMaskEl,
+      description: {
+        type: descriptionType,
+        el: description,
+      },
+      anchorLink,
+      onComplete: () => {
+        if (numbers) {
+          updateNumbers(i);
+        }
+      },
     });
   });
 }
 
-function setListSectionScroll(
-  trigger,
-  isFirst,
-  isLast,
-  titleMaskEl,
-  descriptionLines,
-  numbersCallback
-) {
-  const squaresTitle = titleMaskEl.querySelectorAll("rect");
-  const squaresTitleTiming = squaresTitle.length * 0.01;
+function setListSectionScroll(settings) {
+  const {
+    trigger,
+    isFirst,
+    isLast,
+    titleMaskEl,
+    description,
+    anchorLink,
+    onComplete,
+  } = settings;
+  
+  let squaresTitle, squaresDescription;
 
-  if (!isFirst) {    
-    gsap.set(squaresTitle, { opacity: 0 });
-    gsap.set(descriptionLines, { yPercent: 100 });
+  if (titleMaskEl) {
+    squaresTitle = titleMaskEl.querySelectorAll("rect");
+  }
+  if (description.type === "html") {
+    squaresDescription = description.el.querySelectorAll("rect");
+  }
+
+  if (!isFirst) {
+    if (titleMaskEl) {
+      gsap.set(squaresTitle, { opacity: 0 });
+    }
+
+    if (description.type === "html") {
+      gsap.set(squaresDescription, { opacity: 0 });
+    } else {
+      gsap.set(description.el, { yPercent: 100 });
+    }
+
   } else {
-    gsap.set(squaresTitle, { opacity: 1 });
+    if (titleMaskEl) {
+      gsap.set(squaresTitle, { opacity: 1 });
+    }
+    if (description.type === "html") {
+      gsap.set(squaresDescription, { opacity: 1 });
+    }
   }
   const tlIn = gsap.timeline({ paused: true });
   const tlOut = gsap.timeline({ paused: true });
 
   if (!isFirst) {
-    tlIn
-      .to(
+    if (titleMaskEl) {
+      tlIn.to(
         squaresTitle,
         {
           opacity: 1,
@@ -80,9 +131,28 @@ function setListSectionScroll(
           ease: "bounce.out",
         },
         0
-      )
-      .to(
-        descriptionLines,
+      );
+    }
+
+    if (description.type === "html") {
+      tlIn.to(
+        squaresDescription,
+        {
+          opacity: 1,
+          duration: 0.01,
+          stagger: {
+            from: "random",
+            each: 0.01,
+          },
+          ease: "bounce.out",
+        },
+        0
+      );
+    }
+
+    if (description.type === "text" && description.el) {
+      tlIn.to(
+        description.el,
         {
           yPercent: 0,
           stagger: 0.02,
@@ -92,10 +162,11 @@ function setListSectionScroll(
         // `-=${squaresVideoTiming}`
         0
       );
+    }
   }
 
-  tlOut
-    .to(squaresTitle, {
+  if (titleMaskEl) {
+    tlOut.to(squaresTitle, {
       opacity: 0,
       duration: 0.01,
       stagger: {
@@ -103,9 +174,24 @@ function setListSectionScroll(
         each: 0.01,
       },
       ease: "bounce.out",
-    })
-    .to(
-      descriptionLines,
+    });
+  }
+
+  if (description.type === "html") {
+    tlOut.to(squaresDescription, {
+      opacity: 0,
+      duration: 0.01,
+      stagger: {
+        from: "random",
+        each: 0.01,
+      },
+      ease: "bounce.out",
+    });
+  }
+
+  if (description.type === "text" && description.el) {
+    tlOut.to(
+      description.el,
       {
         yPercent: -100,
         stagger: 0.02,
@@ -114,7 +200,8 @@ function setListSectionScroll(
       },
       0
     );
-  
+  }
+
   let start, end;
 
   if (isFirst) {
@@ -137,69 +224,46 @@ function setListSectionScroll(
       scrub: true,
       pin: false,
       onEnter: () => {
-        // gsap.to(
-        //   squaresVideo,
-        //   {
-        //     opacity: 1,
-        //     duration: 0.005,
-        //     stagger: {
-        //       from: "random",
-        //       each: 0.005,
-        //     },
-        //     ease: "bounce.out",
-        //     immediateRender: true,
-        //   });
         if (!isFirst) {
           tlIn.play();
-          numbersCallback();        
+          if (typeof onComplete === 'function') {
+            onComplete();
+          }
+        }
+
+        if (anchorLink) {
+          anchorLink.classList.add("active");
         }
       },
       onEnterBack: () => {
         tlOut.reverse();
-        numbersCallback();
-        // gsap.to(squaresVideo, {
-        //   opacity: 1,
-        //   duration: 0.005,
-        //   stagger: {
-        //     from: "random",
-        //     each: 0.005,
-        //   },
-        //   ease: "bounce.out",
-        //   immediateRender: true,
-        // });        
+        onComplete();
+        if (anchorLink) {
+          anchorLink.classList.add("active");
+        }
       },
       onLeave: () => {
         if (!isLast) {
           tlOut.play();
-          numbersCallback();
-          // gsap.to(squaresVideo, {
-          //   opacity: 0,
-          //   duration: 0.005,
-          //   stagger: {
-          //     from: "random",
-          //     each: 0.005,
-          //   },
-          //   ease: "bounce.out",
-          //   immediateRender: true,
-          // });          
+          if (typeof onComplete === "function") {
+            onComplete();
+          }
+        }
+        if (anchorLink) {
+          anchorLink.classList.remove("active");
         }
       },
       onLeaveBack: () => {
         if (!isFirst) {
           tlIn.reverse();
-          numbersCallback();
-          // gsap.to(squaresVideo, {
-          //   opacity: 0,
-          //   duration: 0.005,
-          //   stagger: {
-          //     from: "random",
-          //     each: 0.005,
-          //   },
-          //   ease: "bounce.out",
-          //   immediateRender: true,
-          // });          
+          if (typeof onComplete === "function") {
+            onComplete();
+          }
         }
-      }
+        if (anchorLink) {
+          anchorLink.classList.remove("active");
+        }
+      },
     },
   });
 }

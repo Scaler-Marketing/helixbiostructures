@@ -3,8 +3,7 @@ import { setLinesWrapper } from "../modules/setLinesWrapper";
 
 export function initSectionScroll() {
   const wrapper = document.querySelector(".section.list-scroll"),
-    sections = wrapper.querySelectorAll(".sticky-wrapper"),
-    anchors = wrapper.querySelectorAll(".section-nav-item");
+    sections = wrapper.querySelectorAll(".sticky-wrapper");
 
   if (!sections) {
     return;

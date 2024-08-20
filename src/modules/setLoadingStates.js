@@ -24,7 +24,8 @@ export function setLoadingStates() {
   const links = document.querySelectorAll("a");
   links.forEach((l) => {
     l.addEventListener("click", (e) => {
-      const href = this.href;
+      e.preventDefault();
+      const href = l.href;
       const url = new URL(href);
 
       if (

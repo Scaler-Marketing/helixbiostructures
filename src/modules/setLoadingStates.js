@@ -24,13 +24,14 @@ export function setLoadingStates() {
   const links = document.querySelectorAll("a");
   links.forEach((l) => {
     l.addEventListener("click", (e) => {
-      e.preventDefault();
+      // e.preventDefault();
       const href = l.href;
       const url = new URL(href);
 
       if (
         window.location.origin === url.origin &&
-        window.location.pathname !== url.pathname
+        window.location.pathname !== url.pathname &&
+        l.target !== "_blank"
       ) {
         e.preventDefault();
 

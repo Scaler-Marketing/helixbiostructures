@@ -35,14 +35,27 @@ function createScrollTrigger(triggerElement, elements, start, end, stagger, dela
 
 export function setStaggerText() {
   // Split all words on the brand core section
-  const staggerTextEls = new SplitType("[stagger-text]", {
-    types: "lines",
-    tagName: "span",
-  });
+  const textEls = document.querySelectorAll('[stagger-text]');
 
-  setLinesWrapper(staggerTextEls.lines, () => {
-    gsap.set("[stagger-text] .line", { yPercent: 100 });
-  });
+  textEls.forEach((el) => {
+    if (el.classList.contains('w-richtext')) {
+      const staggerTextEls = new SplitType(el.querySelectorAll('p'), {
+        types: "lines",
+        tagName: "span",
+      });
+      setLinesWrapper(staggerTextEls.lines, () => {
+        gsap.set(staggerTextEls.lines, { yPercent: 100 });
+      });
+    } else {
+      const staggerTextEls = new SplitType(el, {
+        types: "lines",
+        tagName: "span",
+      });
+      setLinesWrapper(staggerTextEls.lines, () => {
+        gsap.set(staggerTextEls.lines, { yPercent: 100 });
+      });
+    }
+  })
 
   const textBlocks = document.querySelectorAll("[stagger-text]");
 

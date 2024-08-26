@@ -14,6 +14,9 @@
     "gsap": {
       "global": "gsap"
     },
+    "MorphSVGPlugin": {
+      "global": "MorphSVGPlugin"
+    },
     "split-type": {
       "global": "SplitType"
     },

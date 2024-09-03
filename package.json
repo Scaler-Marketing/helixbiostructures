@@ -22,6 +22,9 @@
     },
     "lenis": {
       "global": "lenis"
+    },
+    "Alpine": {
+      "global": "Alpine"
     }
   }
 }

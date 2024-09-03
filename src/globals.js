@@ -6,6 +6,7 @@ import { playVideoOnScroll, setTransparentVideo } from "./modules/playVideoOnScr
 import { initMenus } from "./modules/menus";
 import { setImageMasks } from "./modules/setImageMasks";
 import { setStaggerElements } from "./modules/staggerElements";
+import { initFormSubmit } from "./modules/formSubmit";
 
 initMenus();
 setLoadingStates();
@@ -14,6 +15,7 @@ playVideoOnScroll();
 setTransparentVideo();
 setImageMasks();
 setStaggerElements();
+initFormSubmit();
 
 document.fonts.ready.then(() => {
   setStaggerText();

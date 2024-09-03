@@ -584,6 +584,27 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 }
 
 },{}],"KPXyx":[function(require,module,exports) {
+function initFormSubmit() {
+    const forms = document.querySelectorAll("form");
+    if (!form) return;
+    forms.forEach((form1)=>{
+        const formSubmitButton = form1.querySelector(".button.form-submit");
+        const submitButton = form1.querySelector(".submit-button");
+        const label = form1.querySelector(".button-label");
+        // add event listener to the form submit button
+        formSubmitButton.addEventListener("click", function(e) {
+            e.preventDefault(); // prevent the default action
+            // check if the form is valid
+            if (form1.checkValidity()) {
+                // if valid, submit the form and change the button text
+                submitButton.click();
+                label.textContent = submitButton.getAttribute("data-wait");
+            } else // if not valid, report validity (this will show the HTML5 validation messages)
+            form1.reportValidity();
+        });
+    });
+}
+initFormSubmit();
 
 },{}]},["5yS2N","KPXyx"], "KPXyx", "parcelRequire5744")
 

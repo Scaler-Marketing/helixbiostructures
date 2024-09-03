@@ -39,7 +39,7 @@ export function setStaggerText() {
 
   textEls.forEach((el) => {
     if (el.classList.contains('w-richtext')) {
-      const staggerTextEls = new SplitType(el.querySelectorAll('p'), {
+      const staggerTextEls = new SplitType(el.querySelectorAll('p, li, h2, h3'), {
         types: "lines",
         tagName: "span",
       });

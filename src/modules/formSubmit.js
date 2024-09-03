@@ -9,6 +9,10 @@ export function initFormSubmit() {
     const formSubmitButton = form.querySelector(".button.form-submit");
     const submitButton = form.querySelector(".submit-button");
     const label = form.querySelector(".button-label");
+
+    if (!formSubmitButton || !submitButton) {
+      return;
+    }
   
     // add event listener to the form submit button
     formSubmitButton.addEventListener("click", function (e) {

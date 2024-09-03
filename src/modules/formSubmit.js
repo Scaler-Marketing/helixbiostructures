@@ -1,7 +1,7 @@
 export function initFormSubmit() {
   const forms = document.querySelectorAll("form");
 
-  if (!form) {
+  if (!forms) {
     return;
   }
 

@@ -9,7 +9,7 @@ function initCareersForm() {
   }
 
   const formCta = formWrapper.querySelector('.careers-form_cta'),
-    formCtaHeight = getElementHeightInRem(formCta);
+    formCtaHeight = getElementHeightInRem(formCta),
     ctaTrigger = formCta.querySelector('.button'),
     form = formWrapper.querySelector('.careers-form'),
     formClose = formWrapper.querySelector('.careers-form_close'),

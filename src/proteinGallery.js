@@ -316,7 +316,7 @@ document.addEventListener("alpine:init", () => {
     purchaseListFormatted() {
       return this.list
         .map((item) => `${item.name} (${item.quantity})`)
-        .join("\n");
+        .join("; \n");
     },
     totalItems() {
       if (this.list.length === 1) {

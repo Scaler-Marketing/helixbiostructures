@@ -7,6 +7,7 @@ import { initMenus } from "./modules/menus";
 import { setImageMasks } from "./modules/setImageMasks";
 import { setStaggerElements } from "./modules/staggerElements";
 import { initFormSubmit } from "./modules/formSubmit";
+import { initContactForm } from "./modules/contactForm";
 
 initMenus();
 setLoadingStates();
@@ -16,6 +17,7 @@ setTransparentVideo();
 setImageMasks();
 setStaggerElements();
 initFormSubmit();
+initContactForm();
 
 document.fonts.ready.then(() => {
   setStaggerText();

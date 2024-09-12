@@ -1,18 +1,19 @@
 export function setImageMasks() {
-  const imageMasks = document.querySelectorAll(".image-mask");
+  const imageMasks = document.querySelectorAll("[image-mask]");
 
   if (!imageMasks) {
     return;
   }
 
   imageMasks.forEach((el) => {
-    if (el.classList.contains("diamond")) {
+    const type = el.getAttribute("image-mask");
+    if (type === "diamond") {
       setDiamondMask(el);
     }
-    if (el.classList.contains("hexagon")) {
+    if (type === "hexagon") {
       setHexagonMask(el);
     }
-    if (el.classList.contains("bubbles")) {
+    if (type === "bubbles") {
       setBubblesMask(el);
     }
   });

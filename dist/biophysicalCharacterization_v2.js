@@ -142,14 +142,14 @@
       this[globalName] = mainExports;
     }
   }
-})({"kOLnE":[function(require,module,exports) {
+})({"cr4GQ":[function(require,module,exports) {
 var global = arguments[3];
 var HMR_HOST = null;
 var HMR_PORT = 50619;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "d6ea1d42532a7575";
 var HMR_USE_SSE = false;
-module.bundle.HMR_BUNDLE_ID = "8f6a649db64d11d7";
+module.bundle.HMR_BUNDLE_ID = "6686c30ef1a357a0";
 "use strict";
 /* global HMR_HOST, HMR_PORT, HMR_ENV_HASH, HMR_SECURE, HMR_USE_SSE, chrome, browser, __parcel__import__, __parcel__importScripts__, ServiceWorkerGlobalScope */ /*::
 import type {
@@ -583,214 +583,130 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
     });
 }
 
-},{}],"2kpD5":[function(require,module,exports) {
-var _createSVGGrid = require("./modules/createSVGGrid");
-var _getHeight = require("./modules/getHeight");
-function initTestimonials() {
-    // Variables
-    const wrapper = document.querySelector(".testimonials-wrapper"), sliderContent = wrapper.querySelectorAll(".testimonial-item .testimonial-content"), names = wrapper.querySelector(".testimonial-source-wrapper .testimonial-source-list"), companies = wrapper.querySelector(".testimonial-company-wrapper .testimonial-source-list"), nextButton = document.querySelector(".button.next"), prevButton = document.querySelector(".button.prev");
-    const namesHeight = Number((0, _getHeight.getElementHeightInRem)(names.parentNode).toFixed(2));
-    const companiesHeight = Number((0, _getHeight.getElementHeightInRem)(companies.parentNode).toFixed(2));
-    // console.log(namesHeight, companiesHeight);
-    let currentIndex = 0;
-    sliderContent.forEach((content)=>{
-        (0, _createSVGGrid.createSVGGrid)(content, 10);
-    });
-    gsap.set(".testimonial-item svg rect", {
-        opacity: 0
-    });
-    gsap.set(".testimonial-item:first-child svg rect", {
-        opacity: 1
-    });
-    // clone last and first item from each name and company
-    const allNames = names.querySelectorAll(".testimonial-source"), firstName = allNames[0], firstNameClone = firstName.cloneNode(true), lastName = allNames[allNames.length - 1], lastNameClone = lastName.cloneNode(true);
-    names.insertBefore(lastNameClone, firstName);
-    names.append(firstNameClone);
-    // set styles
-    gsap.set(firstNameClone, {
-        position: "absolute",
-        top: "100%",
-        left: 0
-    });
-    gsap.set(lastNameClone, {
-        position: "absolute",
-        bottom: "100%",
-        left: 0
-    });
-    const allCompanies = companies.querySelectorAll(".testimonial-source"), firstCompany = allCompanies[0], firstCompanyClone = firstCompany.cloneNode(true), lastCompany = allCompanies[allCompanies.length - 1], lastCompanyClone = lastCompany.cloneNode(true);
-    companies.insertBefore(lastCompanyClone, firstCompany);
-    companies.append(firstCompanyClone);
-    // set styles
-    gsap.set(firstCompanyClone, {
-        position: "absolute",
-        top: "100%",
-        left: 0
-    });
-    gsap.set(lastCompanyClone, {
-        position: "absolute",
-        bottom: "100%",
-        left: 0
-    });
-    // Next button click
-    nextButton.addEventListener("click", ()=>{
-        let currentSlide = sliderContent[currentIndex];
-        if (currentIndex < sliderContent.length - 1) {
-            let nextSlide = sliderContent[currentIndex + 1];
-            transitionSlides(currentSlide, nextSlide, currentIndex + 1, sliderContent.length - 1, "next", names, namesHeight, companies, companiesHeight);
-            currentIndex++;
-        } else {
-            let nextSlide = sliderContent[0];
-            transitionSlides(currentSlide, nextSlide, 0, sliderContent.length - 1, "next", names, namesHeight, companies, companiesHeight);
-            currentIndex = 0;
-        }
-    });
-    // Prev button click
-    prevButton.addEventListener("click", ()=>{
-        let currentSlide = sliderContent[currentIndex];
-        if (currentIndex > 0) {
-            let prevSlide = sliderContent[currentIndex - 1];
-            transitionSlides(currentSlide, prevSlide, currentIndex - 1, sliderContent.length - 1, "prev", names, namesHeight, companies, companiesHeight);
-            currentIndex--;
-        } else {
-            let prevSlide = sliderContent[sliderContent.length - 1];
-            transitionSlides(currentSlide, prevSlide, sliderContent.length - 1, sliderContent.length - 1, "prev", names, namesHeight, companies, companiesHeight);
-            currentIndex = sliderContent.length - 1;
-        }
+},{}],"c5P4A":[function(require,module,exports) {
+var _setLinesWrapper = require("./modules/setLinesWrapper");
+function initMethodsList() {
+    const team = document.querySelectorAll(".bio-char-method-item");
+    if (!team) return;
+    team.forEach((member)=>{
+        const trigger = member.querySelector(".bio-char-method"), modal = member.querySelector(".bio-char-method_modal");
+        if (!trigger || !modal) return;
+        const close = modal.querySelector(".bio-char-method_modal-close");
+        const tl = setModal(modal);
+        trigger.addEventListener("click", ()=>openModal(tl));
+        close.addEventListener("click", ()=>closeModal(tl));
+        const modalCloseCircles1 = close.querySelectorAll("svg circle");
+        close.addEventListener("mouseenter", ()=>{
+            gsap.fromTo(modalCloseCircles1, {
+                opacity: 0
+            }, {
+                opacity: 1,
+                duration: 0.01,
+                stagger: {
+                    from: "random",
+                    each: 0.05
+                },
+                ease: "none"
+            });
+        });
     });
 }
-function transitionSlides(current, next, index, total, direction, names, namesHeight, companies, companiesHeight) {
-    const currentSquares = current.parentNode.querySelectorAll("rect"), nextSquares = next.parentNode.querySelectorAll("rect");
-    // next slide
-    gsap.fromTo(nextSquares, {
+function setModal(modal) {
+    const imgWrapper = modal.querySelector(".bio-char-method_modal-img"), contentWrapper = modal.querySelector(".bio-char-method_modal-content"), // content = contentWrapper.querySelectorAll(
+    //   ".bio-char-method_content h3, .bio-char-method_content p"
+    // ),
+    backdrop = modal.querySelector(".bio-char-method_modal-backdrop");
+    modalCloseCircles = modal.querySelectorAll(".bio-char-method_modal-close svg circle");
+    gsap.set(imgWrapper, {
+        height: 0
+    });
+    gsap.set(contentWrapper, {
+        height: 0
+    });
+    gsap.set(backdrop, {
+        display: "none",
         opacity: 0
-    }, {
+    });
+    gsap.set(modalCloseCircles, {
+        opacity: 0
+    });
+    gsap.set(modal, {
+        visibility: "hidden",
+        backdropFilter: "blur(0px)"
+    });
+    // // Split all words on the brand core section
+    // content.forEach((l) => {
+    //   const staggerTextEls = new SplitType(l, {
+    //     types: "lines",
+    //     tagName: "span",
+    //   });
+    //   setLinesWrapper(staggerTextEls.lines, () => {
+    //     gsap.set(staggerTextEls.lines, { yPercent: 100 });
+    //   });
+    // });
+    const tl = gsap.timeline({
+        paused: true
+    });
+    tl.set(backdrop, {
+        display: "block"
+    }).to(modal, {
+        visibility: "visible",
+        backdropFilter: "blur(24px)",
+        duration: 0.5
+    }, 0).to(backdrop, {
+        opacity: 0.8,
+        duration: 0.5,
+        ease: "expo.inOut"
+    }, 0).to(imgWrapper, {
+        height: "auto",
+        duration: 1,
+        ease: "expo.inOut"
+    }, 0.1).to(contentWrapper, {
+        height: "auto",
+        duration: 1,
+        ease: "expo.inOut"
+    }, 0.2).to(modalCloseCircles, {
         opacity: 1,
         duration: 0.01,
         stagger: {
-            each: 0.01,
-            // grid: "auto",
-            // from: "center"
-            from: "random"
-        }
-    });
-    // current slide
-    gsap.fromTo(currentSquares, {
-        opacity: 1
-    }, {
-        opacity: 0,
-        duration: 0.01,
-        stagger: {
-            each: 0.01,
-            // grid: "auto",
-            // from: "center"
-            from: "random"
-        }
-    });
-    // names list
-    const yNames = calculateYPosition(index, total, direction, namesHeight);
-    // console.log(index, total, direction, yNames);
-    gsap.to(names, {
-        y: `${yNames}rem`,
-        duration: 0.5,
-        ease: "expo.out",
-        onComplete: ()=>{
-        // if (index === 0 && direction === "prev") {
-        //   gsap.set(names, { y: `${(total - 1) * 2}rem` });
-        // }
-        // if (index === total && direction === "next") {
-        //   gsap.set(names, { y: "0rem" });
-        // }
-        }
-    });
-    // companies list
-    const yCompanies = calculateYPosition(index, total, direction, companiesHeight);
-    gsap.to(companies, {
-        y: `${yCompanies}rem`,
-        duration: 0.5,
-        ease: "expo.out",
-        onComplete: ()=>{
-        // if (index === 0 && direction === "prev") {
-        //   gsap.set(names, { y: `${(total - 1) * companiesHeight}rem` });
-        // }
-        // if (index === total && direction === "next") {
-        //   gsap.set(names, { y: "0rem" });
-        // }
-        }
-    });
+            from: "random",
+            each: 0.05
+        },
+        ease: "none"
+    }, 0.2);
+    // .to(
+    //   contentWrapper.querySelectorAll(".bio-char-method_content .line"),
+    //   {
+    //     yPercent: 0,
+    //     // duration: 1,
+    //     stagger: 0.01,
+    //     ease: "expo.inOut",
+    //   },
+    //   0.5
+    // );
+    return tl;
 }
-function calculateYPosition(index, total, direction, height) {
-    if (index === 0 && direction === "prev") return -1 * height;
-    if (index === total && direction === "next") return -1 * height * total;
-    const newIndex = direction === "next" ? index + 1 : index - 1;
-    return index * (-1 * height);
+async function openModal(tl) {
+    tl.play();
 }
-document.fonts.ready.then(()=>{
-    initTestimonials();
-});
+function closeModal(tl) {
+    tl.reverse();
+}
+initMethodsList();
 
-},{"./modules/createSVGGrid":"8Spds","./modules/getHeight":"1eyAq"}],"8Spds":[function(require,module,exports) {
+},{"./modules/setLinesWrapper":"hPUmk"}],"hPUmk":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "createSVGGrid", ()=>createSVGGrid);
-function createSVGGrid(container, squaresPerRow, fill, onlyEmbed) {
-    if (!container) {
-        console.error("Container not found");
-        return;
-    }
-    // Get the container's dimensions
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-    const responsiveSquares = window.innerWidth <= 991 ? squaresPerRow / 2 : squaresPerRow;
-    // Calculate the size of each square
-    const squareSize = parseInt(containerWidth / responsiveSquares);
-    // Calculate the number of squares per column
-    const squaresPerColumn = Math.ceil(containerHeight / squareSize);
-    // Create a unique ID for the mask
-    const maskId = "mask-" + Math.random().toString(36).substr(2, 9);
-    if (!onlyEmbed) {
-        // Create SVG content
-        let svgContent = `
-                <svg viewBox="0 0 ${containerWidth} ${containerHeight}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
-                    <defs>
-                        <mask id="${maskId}">
-                            ${Array.from({
-            length: squaresPerColumn
-        }).map((_, row)=>Array.from({
-                length: responsiveSquares
-            }).map((_, col)=>{
-                const x = col * squareSize;
-                const y = row * squareSize;
-                return `<rect x="${x}" y="${y}" width="${squareSize + 1}" height="${squareSize + 1}" fill="${fill ? fill : "#000000"}"/>`;
-            }).join("")).join("")}
-                        </mask>
-                    </defs>
-                </svg>`;
-        // Create wrapper for the SVG and mask
-        const maskContainer = document.createElement("div");
-        maskContainer.className = "mask-container";
-        maskContainer.style.maskImage = `url(#${maskId})`;
-        // Append SVG to maskContainer
-        maskContainer.innerHTML = svgContent;
-        container.parentNode.insertBefore(maskContainer, container);
-        maskContainer.appendChild(container);
-        return maskContainer.querySelector("svg");
-    } else {
-        // Create SVG content
-        let svgContent = `
-                <svg viewBox="0 0 ${containerWidth} ${containerHeight}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
-                            ${Array.from({
-            length: squaresPerColumn
-        }).map((_, row)=>Array.from({
-                length: squaresPerRow
-            }).map((_, col)=>{
-                const x = col * squareSize;
-                const y = row * squareSize;
-                return `<rect x="${x}" y="${y}" width="${squareSize + 1}" height="${squareSize + 1}" fill="${fill ? fill : "#000000"}"/>`;
-            }).join("")).join("")}
-                </svg>`;
-        container.insertAdjacentHTML("beforeend", svgContent);
-        return svgContent;
-    }
+parcelHelpers.export(exports, "setLinesWrapper", ()=>setLinesWrapper);
+function setLinesWrapper(lines, callback) {
+    // Wrap each line in a .line-wrapper span
+    lines.forEach((line)=>{
+        const wrapper = document.createElement("span");
+        wrapper.classList.add("line-wrapper");
+        line.parentNode.insertBefore(wrapper, line);
+        wrapper.appendChild(line);
+    });
+    if (typeof callback === "function") callback();
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
@@ -823,43 +739,6 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}],"1eyAq":[function(require,module,exports) {
-/**
- * Converts a length value from any CSS unit to pixels.
- * @param {string} value - The length value as a string (e.g., "2rem", "50px").
- * @returns {number} - The length value in pixels.
- */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-/**
- * Calculates the height of an element in rem units.
- * @param {HTMLElement} element - The target element.
- * @returns {number} - The height of the element in rem units.
- */ parcelHelpers.export(exports, "getElementHeightInRem", ()=>getElementHeightInRem);
-function convertToPixels(value) {
-    // Create a temporary element to use the browser's rendering to convert the value to pixels
-    const tempElement = document.createElement("div");
-    tempElement.style.position = "absolute";
-    tempElement.style.visibility = "hidden";
-    tempElement.style.width = value;
-    document.body.appendChild(tempElement);
-    const pixelValue = parseFloat(window.getComputedStyle(tempElement).width);
-    document.body.removeChild(tempElement);
-    return pixelValue;
-}
-function getElementHeightInRem(element) {
-    if (!element) throw new Error("Element is required");
-    // Get the computed style of the element
-    const computedStyle = window.getComputedStyle(element);
-    // Get the height of the element in pixels
-    const heightInPixels = parseFloat(computedStyle.height);
-    // Get the font size of the root element (html) in rem units and convert it to pixels
-    const rootFontSizeInRem = window.getComputedStyle(document.documentElement).fontSize;
-    const rootFontSizeInPixels = convertToPixels(rootFontSizeInRem);
-    // Calculate height in rem units
-    const heightInRem = heightInPixels / rootFontSizeInPixels;
-    return heightInRem;
-}
+},{}]},["cr4GQ","c5P4A"], "c5P4A", "parcelRequire5744")
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["kOLnE","2kpD5"], "2kpD5", "parcelRequire5744")
-
-//# sourceMappingURL=testimonials.js.map
+//# sourceMappingURL=biophysicalCharacterization_v2.js.map

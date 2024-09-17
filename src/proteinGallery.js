@@ -41,13 +41,13 @@ function initProteinGallery(store) {
 
     plus.addEventListener("click", (e) => {
       e.preventDefault();
-      quantity.value++;
+      quantity.value += 0.1;
     });
     minus.addEventListener("click", (e) => {
       e.preventDefault();
 
       if (quantity.value > 0) {
-        quantity.value--;
+        quantity.value -= 0.1;
       }
     });
   });
@@ -315,7 +315,7 @@ document.addEventListener("alpine:init", () => {
     },
     purchaseListFormatted() {
       return this.list
-        .map((item) => `${item.name} (${item.quantity})`)
+        .map((item) => `${item.name} (${item.quantity}mg)`)
         .join("; \n");
     },
     totalItems() {

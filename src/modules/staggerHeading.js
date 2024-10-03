@@ -17,6 +17,7 @@ function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
         opacity: 1,
         delay: delay,
         duration: 0.01,
+        overwrite: "auto",
         stagger: {
           each: 0.01,
           from: "random",
@@ -35,6 +36,7 @@ function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
       .to(squares, {
         opacity: 1,
         duration: 0.01,
+        overwrite: "auto",
         stagger: {
           each: 0.01,
           from: "random",

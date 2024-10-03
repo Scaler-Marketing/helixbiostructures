@@ -235,25 +235,3 @@ async function openModal(tl) {
 function closeModal(tl) {
   tl.reverse();
 }
-
-async function fetchVideoData(id) {
-  if (!id) {
-    return;
-  }
-
-  const url = `https://vimeo.com/api/v2/video/${id}.json`;
-
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
-    }
-
-    const json = await response.json();
-
-    return json[0];
-  } catch (error) {
-    console.error(error.message);
-    throw new Error(error.message);
-  }
-}

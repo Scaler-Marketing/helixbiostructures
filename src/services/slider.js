@@ -8,7 +8,10 @@ export function initServicesSlider() {
   sliders.forEach((s) => {
     const slider = new Swiper(s, {
       slidesPerView: "auto",
-      // spaceBetween: 30,
+      navigation: {
+        nextEl: ".slider-controls .button.next",
+        prevEl: ".slider-controls .button.prev",
+      },
     });
 
     // gsap logic

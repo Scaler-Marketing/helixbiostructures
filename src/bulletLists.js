@@ -9,7 +9,7 @@ function initBulletLists() {
 
   items.forEach((item) => {
     const bullet = item.querySelector(".bullet-list_icon"),
-      text = item.querySelector("p");
+      text = item.querySelector(".text-rich-text p");
     
     gsap.set(bullet, { scale: 0 });
 

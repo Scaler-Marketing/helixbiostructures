@@ -9,8 +9,8 @@ export function initNewsSlider() {
     const slider = new Swiper(s, {
       slidesPerView: "auto",
       navigation: {
-        nextEl: ".slider-controls .button.next",
-        prevEl: ".slider-controls .button.prev",
+        nextEl: s.querySelector(".slider-controls .button.next"),
+        prevEl: s.querySelector(".slider-controls .button.prev"),
       },
       // spaceBetween: 30,
     });

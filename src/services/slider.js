@@ -3,10 +3,11 @@ export function initServicesSlider() {
     return;
   }
 
-  const sliders = document.querySelectorAll(".news-slider");
+  const sliders = document.querySelectorAll(".news-slider_wrapper");
 
   sliders.forEach((s) => {
-    const slider = new Swiper(s, {
+
+    const slider = new Swiper(s.querySelector('.news-slider'), {
       slidesPerView: "auto",
       navigation: {
         nextEl: s.querySelector(".slider-controls .button.next"),

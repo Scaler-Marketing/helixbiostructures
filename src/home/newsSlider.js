@@ -8,6 +8,10 @@ export function initNewsSlider() {
   sliders.forEach((s) => {
     const slider = new Swiper(s, {
       slidesPerView: "auto",
+      navigation: {
+        nextEl: ".slider-controls .button.next",
+        prevEl: ".slider-controls .button.prev",
+      },
       // spaceBetween: 30,
     });
 

@@ -1,0 +1,2 @@
+!function(){let o=document.querySelectorAll(".bio-char-methods_list .bio-char-method_item");o&&(console.log(o),o.forEach((o,e)=>{let t=o.dataset.id,r=document.querySelector(`.bio-char-method_bg[data-id="${t}"]`);console.log(o,t),r&&0!==e&&(console.log(r),gsap.fromTo(r,{opacity:0},{opacity:1,scrollTrigger:{trigger:o,start:"bottom bottom",end:"center center",scrub:!0,pin:!1,markers:!1}}))}))}();
+//# sourceMappingURL=biophysicalCharacterization_v3.js.map

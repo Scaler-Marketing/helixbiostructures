@@ -13,14 +13,17 @@ function createIntroText(triggerElement, index, amount) {
 
   setLinesWrapper(isLast ? aboutIntroText.words : aboutIntroText.lines, () => {
     if (isLast) {
-      gsap.set(".intro-text .word", { yPercent: 100 });
+      gsap.set(aboutIntroText.words, { yPercent: 100 });
     } else {
-      gsap.set(".intro-text .line", { yPercent: 100 });
+      if (!isFirst) {
+        gsap.set(aboutIntroText.lines, { yPercent: 100 });
+      }
     }
   });
 
   const words = isLast ? aboutIntroText.words : aboutIntroText.lines;
 
+  if (!isFirst) {
     gsap.fromTo(
       words,
       {
@@ -39,6 +42,7 @@ function createIntroText(triggerElement, index, amount) {
         },
       }
     );
+  }
 
   if (!isLast) {
     gsap.fromTo(

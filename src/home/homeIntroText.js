@@ -17,7 +17,7 @@ function createHomeIntroText(triggerElement, words, index, amount) {
         scrollTrigger: {
           trigger: triggerElement,
           scrub: true,
-          start: "80% bottom",
+          start: "90% bottom",
           end: "bottom bottom",
           // markers: true,
           pin: false,
@@ -39,7 +39,7 @@ function createHomeIntroText(triggerElement, words, index, amount) {
           trigger: triggerElement,
           scrub: true,
           start: "top top",
-          end: "30% top",
+          end: "20% top",
           // markers: true,
           pin: false,
         },
@@ -57,7 +57,7 @@ function createHomeIntroText(triggerElement, words, index, amount) {
         scrollTrigger: {
           trigger: triggerElement,
           scrub: true,
-          start: "80% bottom",
+          start: "90% bottom",
           end: "bottom bottom",
           // markers: true,
           pin: false,

@@ -7,32 +7,108 @@ function initMethodsList() {
     return;
   }
 
-  console.log(triggers);
-
   triggers.forEach((trigger, i) => {
     const id = trigger.dataset.id;
-    const img = document.querySelector(`.bio-char-method_bg[data-id="${id}"]`);
-    console.log(trigger, id);
+    const img = document.querySelector(`.bio-char-method_bg[data-id="${id}"]`),
+      details = trigger.querySelector(".bio-char-method_details");
+
+    gsap.set(details, {
+      opacity: 0.3,
+      boxShadow: "inset 0 0 0 1px rgba(75,94,234,0)",
+    });
+
+    gsap.timeline({
+      scrollTrigger: {
+        trigger,
+        start: "center bottom",
+        end: "bottom center",
+        scrub: true,
+        pin: false,
+        markers: false,
+        onEnter: () => {
+          gsap.to(
+            details,
+            {
+              opacity: 1,
+              boxShadow: "inset 0 0 0 1px rgba(75,94,234,1)",
+              duration: 1,
+              ease: "expo.out"
+            }
+          );
+        },
+        onEnterBack: () => {
+          gsap.to(
+            details,
+            {
+              opacity: 1,
+              boxShadow: "inset 0 0 0 1px rgba(75,94,234,1)",
+              duration: 1,
+              ease: "expo.out",
+            }
+          );
+        },
+        onLeave: () => {
+          gsap.to(
+            details,
+            {
+              opacity: 0.3,
+              boxShadow: "inset 0 0 0 1px rgba(75,94,234,0)",
+              duration: 1,
+              ease: "expo.out"
+            }
+          );
+        },
+        onLeaveBack: () => {
+          gsap.to(
+            details,
+            {
+              opacity: 0.3,
+              boxShadow: "inset 0 0 0 1px rgba(75,94,234,0)",
+              duration: 1,
+              ease: "expo.out"
+            }
+          );
+        },
+      },
+    });
 
     if (!img || i === 0) {
       return;
     }
-    console.log(img);
 
-    gsap.fromTo(img, {
-      opacity: 0
-    }, {
-      opacity: 1,
+    gsap.set(img, {opacity: 0});
+
+    gsap.timeline({
       scrollTrigger: {
         trigger,
-        start: "bottom bottom",
-        end: "center center",
+        start: "center bottom",
+        end: "bottom center",
         scrub: true,
         pin: false,
         markers: false,
-      }
+        onEnter: () => {
+          gsap.to(img, {
+            opacity: 1,
+            duration: 1,
+            overwrite: "auto",
+            immediateRender: true,
+            ease: "expo.out",
+          });
+        },
+        onLeaveBack: () => {
+          gsap.to(img, {
+            opacity: 0,
+            duration: 1,
+            overwrite: "auto",
+            immediateRender: true,
+            ease: "expo.out",
+          });
+        },
+      },
     });
   });
 }
 
-initMethodsList();
+if (window.innerWidth > 768) {
+  initMethodsList();    
+}

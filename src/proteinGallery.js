@@ -41,13 +41,14 @@ function initProteinGallery(store) {
 
     plus.addEventListener("click", (e) => {
       e.preventDefault();
-      quantity.value += 0.1;
+      quantity.value = parseFloat(Number(quantity.value) + 0.1).toFixed(1);
     });
     minus.addEventListener("click", (e) => {
       e.preventDefault();
 
-      if (quantity.value > 0) {
-        quantity.value -= 0.1;
+      if (Number(quantity.value) > 0) {
+        quantity.value = parseFloat(Number(quantity.value) - 0.1).toFixed(1);
+
       }
     });
   });

@@ -11,17 +11,22 @@ import { initContactForm } from "./modules/contactForm";
 import { setVideosModal } from "./modules/videoModal";
 import { setProteinStore } from "./modules/proteinCart";
 
-initMenus();
-setLoadingStates();
-initButtonStates();
-playVideoOnScroll();
-setTransparentVideo();
-setImageMasks();
-setStaggerElements();
-initFormSubmit();
-initContactForm();
-setVideosModal();
-setProteinStore();
+
+// wait until DOM is ready (html and svg markup)
+document.addEventListener("DOMContentLoaded", function() {
+  setLoadingStates();
+  initMenus();
+  initButtonStates();
+  playVideoOnScroll();
+  setTransparentVideo();
+  setImageMasks();
+  setStaggerElements();
+  initFormSubmit();
+  initContactForm();
+  setVideosModal();
+  setProteinStore();
+});
+
 
 document.fonts.ready.then(() => {
   setStaggerText();

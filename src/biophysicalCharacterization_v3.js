@@ -21,7 +21,7 @@ function initMethodsList() {
       scrollTrigger: {
         trigger,
         start: "center bottom",
-        end: "bottom center",
+        end: "75% center",
         scrub: true,
         pin: false,
         markers: false,

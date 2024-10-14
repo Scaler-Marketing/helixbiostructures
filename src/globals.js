@@ -24,9 +24,9 @@ document.addEventListener("DOMContentLoaded", function() {
   initFormSubmit();
   initContactForm();
   setVideosModal();
-  setProteinStore();
 });
 
+setProteinStore();
 
 document.fonts.ready.then(() => {
   setStaggerText();

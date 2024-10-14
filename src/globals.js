@@ -9,6 +9,7 @@ import { setStaggerElements } from "./modules/staggerElements";
 import { initFormSubmit } from "./modules/formSubmit";
 import { initContactForm } from "./modules/contactForm";
 import { setVideosModal } from "./modules/videoModal";
+import { setProteinStore } from "./modules/proteinCart";
 
 initMenus();
 setLoadingStates();
@@ -20,6 +21,7 @@ setStaggerElements();
 initFormSubmit();
 initContactForm();
 setVideosModal();
+setProteinStore();
 
 document.fonts.ready.then(() => {
   setStaggerText();

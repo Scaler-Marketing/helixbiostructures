@@ -3,14 +3,16 @@ import { setLinesWrapper } from "../modules/setLinesWrapper";
 
 export function initSectionScroll() {
   const wrapper = document.querySelector(".section.list-scroll"),
-    sections = wrapper.querySelectorAll(".sticky-wrapper");
+    parent = wrapper.querySelector('.section-sticky.services'),
+    sections = wrapper.querySelectorAll(".section-services_inner");
 
   if (!sections) {
     return;
   }
 
   sections.forEach((section, i) => {
-    const id = section.querySelector('.section-anchor').id,
+    const id = section.dataset.section,
+      trigger = document.getElementById(id),
       title = section.querySelector("h2"),
       description = section.querySelector("p"),
       button = section.querySelector(".button"),
@@ -18,6 +20,8 @@ export function initSectionScroll() {
       anchorLink = wrapper.querySelector(
         `.section-nav-item[data-target="${id}"]`
       );
+    
+    console.log(id, trigger, title, description, button, videoBg, anchorLink);
 
     let descriptionLines;
 
@@ -36,7 +40,7 @@ export function initSectionScroll() {
     let scrollTimeout;
 
     setListSectionScroll(
-      section,
+      trigger,
       i === 0,
       i === sections.length - 1,
       maskEl,
@@ -75,51 +79,50 @@ function setListSectionScroll(
     gsap.set(squaresTitle, { opacity: 1 });
     gsap.set(squaresVideo, { opacity: 1 });
   }
-  const tlIn = gsap.timeline({ paused: true });
-  const tlOut = gsap.timeline({ paused: true });
+  const tlContent = gsap.timeline({ paused: true });
+  const tlVideo = gsap.timeline({ paused: true });
 
-  if (!isFirst) {
-    tlIn
-      .to(
-        squaresTitle,
-        {
-          opacity: 1,
-          duration: 0.01,
-          overwrite: "auto",
-          stagger: {
-            from: "random",
-            each: 0.01,
-          },
-          ease: "bounce.out",
+  tlContent
+    .to(
+      squaresTitle,
+      {
+        opacity: 1,
+        duration: 0.01,
+        overwrite: "auto",
+        stagger: {
+          from: "random",
+          each: 0.01,
         },
-        0
-      )
-      .to(
-        descriptionLines,
-        {
-          yPercent: 0,
-          stagger: 0.02,
-          duration: 0.5,
-          overwrite: "auto",
-          ease: "power4.inOut",
-        },
-        // `-=${squaresVideoTiming}`
-        0
-      )
-      .to(
-        button,
-        {
-          yPercent: 0,
-          duration: 0.5,
-          overwrite: "auto",
-          ease: "power4.inOut",
-        },
-        // "-=0.5"
-        0
-      );
-  }
-
-  tlOut
+        ease: "bounce.out",
+        // immediateRender: true,
+      },
+      0
+    )
+    .to(
+      descriptionLines,
+      {
+        yPercent: 0,
+        stagger: 0.02,
+        duration: 0.5,
+        overwrite: "auto",
+        ease: "power4.inOut",
+        // immediateRender: true,
+      },
+      // `-=${squaresVideoTiming}`
+      0
+    )
+    .to(
+      button,
+      {
+        yPercent: 0,
+        duration: 0.5,
+        overwrite: "auto",
+        ease: "power4.inOut",
+        // immediateRender: true,
+      },
+      // "-=0.5"
+      0
+    )
     .to(squaresTitle, {
       opacity: 0,
       duration: 0.01,
@@ -129,20 +132,8 @@ function setListSectionScroll(
         each: 0.01,
       },
       ease: "bounce.out",
-    })
-    // .to(
-    //   squaresVideo,
-    //   {
-    //     fill: "#000",
-    //     duration: 0.005,
-    //     stagger: {
-    //       from: "random",
-    //       each: 0.005,
-    //     },
-    //     ease: "bounce.out",
-    //   },
-    //   0
-    // )
+      // immediateRender: true,
+    }, 0.5)
     .to(
       descriptionLines,
       {
@@ -151,9 +142,9 @@ function setListSectionScroll(
         duration: 0.5,
         overwrite: "auto",
         ease: "power4.inOut",
+        // immediateRender: true,
       },
-      // `-=${squaresVideoTiming}`
-      0
+      0.5
     )
     .to(
       button,
@@ -162,11 +153,40 @@ function setListSectionScroll(
         duration: 0.5,
         overwrite: "auto",
         ease: "power4.inOut",
+        // immediateRender: true,
       },
-      // "-=0.5"
-      0
-    );
+      0.5
+  );
+  
+  tlContent.addPause(0.5);
+  tlContent.addLabel('out', 0.5);
 
+  tlVideo
+    .to(squaresVideo, {
+      opacity: 1,
+      duration: 0.005,
+      overwrite: "auto",
+      stagger: {
+        from: "random",
+        each: 0.005,
+      },
+      ease: "bounce.out",
+      // immediateRender: true,
+    })
+    .addPause()
+    .addLabel('out')
+    .to(squaresVideo, {
+      opacity: 0,
+      duration: 0.005,
+      overwrite: "auto",
+      stagger: {
+        from: "random",
+        each: 0.005,
+      },
+      ease: "bounce.out",
+      // immediateRender: true,
+    });  
+  
   let start, end;
 
   if (isFirst) {
@@ -183,91 +203,44 @@ function setListSectionScroll(
   gsap.timeline({
     scrollTrigger: {
       trigger,
-      start,
-      end,
+      start: "top center",
+      end: "bottom center",
       // markers: true,
       scrub: true,
+      fastScrollEnd: 500,
+      preventOverlaps: "home-services",
       pin: false,
       onEnter: () => {
         if (!isFirst) {
-          clearTimeout(scrollTimeout);
-          scrollTimeout = setTimeout(() => {
-            console.log("onEnter", anchorLink);
-            gsap.to(squaresVideo, {
-              opacity: 1,
-              duration: 0.005,
-              overwrite: "auto",
-              stagger: {
-                from: "random",
-                each: 0.005,
-              },
-              ease: "bounce.out",
-              immediateRender: true,
-            });
-            tlIn.play();
-            anchorLink.classList.add("active");
-          }, 200); // Wait 0.5 seconds
+          console.log("onEnter", anchorLink);
+          tlContent.play();
+          tlVideo.play();
+          anchorLink.classList.add("active");
         }
       },
       onEnterBack: () => {
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-          console.log('onEnterBack', anchorLink)
-          tlOut.reverse();
-          gsap.to(squaresVideo, {
-            opacity: 1,
-            duration: 0.005,
-            overwrite: "auto",
-            stagger: {
-              from: "random",
-              each: 0.005,
-            },
-            ease: "bounce.out",
-            immediateRender: true,
-          });
+        if (!isLast) {
+          console.log('onEnterBack', anchorLink);
+          tlContent.progress(1).reverse();
+          tlVideo.progress(1).reverse();
+          
           anchorLink.classList.add("active");
-        }, 200); // Wait 0.5 seconds
+        }
       },
       onLeave: () => {
         if (!isLast) {
-          clearTimeout(scrollTimeout);
-          scrollTimeout = setTimeout(() => {
             console.log("OnLeave", anchorLink);
-            tlOut.play();
-            gsap.to(squaresVideo, {
-              opacity: 0,
-              duration: 0.005,
-              overwrite: "auto",
-              stagger: {
-                from: "random",
-                each: 0.005,
-              },
-              ease: "bounce.out",
-              immediateRender: true,
-            });
+            tlContent.seek("out").play();
+            tlVideo.seek("out").play();
           anchorLink.classList.remove("active");
-          }, 200); // Wait 0.5 seconds
         }
       },
       onLeaveBack: () => {
         if (!isFirst) {
-          clearTimeout(scrollTimeout);
-          scrollTimeout = setTimeout(() => {
             console.log("OnLeaveBack", anchorLink);
-            tlIn.reverse();
-            gsap.to(squaresVideo, {
-              opacity: 0,
-              duration: 0.005,
-              overwrite: "auto",
-              stagger: {
-                from: "random",
-                each: 0.005,
-              },
-              ease: "bounce.out",
-              immediateRender: true,
-            });
+            tlContent.seek("out").reverse();
+            tlVideo.seek("out").reverse();
             anchorLink.classList.remove("active");
-          }, 200); // Wait 0.5 seconds
         }
       },
     },

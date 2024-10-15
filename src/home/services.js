@@ -3,8 +3,7 @@ import { setLinesWrapper } from "../modules/setLinesWrapper";
 
 export function initSectionScroll() {
   const wrapper = document.querySelector(".section.list-scroll"),
-    parent = wrapper.querySelector('.section-sticky.services'),
-    sections = wrapper.querySelectorAll(".section-services_inner");
+    sections = wrapper.querySelectorAll(".section-list-scroll_inner");
 
   if (!sections) {
     return;
@@ -21,8 +20,6 @@ export function initSectionScroll() {
         `.section-nav-item[data-target="${id}"]`
       );
     
-    console.log(id, trigger, title, description, button, videoBg, anchorLink);
-
     let descriptionLines;
 
     const maskEl = createSVGGrid(title, 10);
@@ -65,20 +62,19 @@ function setListSectionScroll(
   scrollTimeout
 ) {
   const squaresTitle = titleMaskEl.querySelectorAll("rect");
-  const squaresTitleTiming = squaresTitle.length * 0.01;
   const squaresVideo = maskVideo.querySelectorAll("rect");
-  const squaresVideoTiming = squaresVideo.length * 0.005;
 
   if (!isFirst) {
     gsap.set(squaresTitle, { opacity: 0 });
     gsap.set(squaresVideo, { opacity: 0 });
-    gsap.set(descriptionLines, { yPercent: 100 });
+    gsap.set(descriptionLines, { yPercent: 105 });
     gsap.set(button, { yPercent: 105 });
   } else {
     anchorLink.classList.add("active");
     gsap.set(squaresTitle, { opacity: 1 });
     gsap.set(squaresVideo, { opacity: 1 });
   }
+
   const tlContent = gsap.timeline({ paused: true });
   const tlVideo = gsap.timeline({ paused: true });
 
@@ -93,8 +89,7 @@ function setListSectionScroll(
           from: "random",
           each: 0.01,
         },
-        ease: "bounce.out",
-        // immediateRender: true,
+        ease: "power4.inOut",
       },
       0
     )
@@ -106,9 +101,7 @@ function setListSectionScroll(
         duration: 0.5,
         overwrite: "auto",
         ease: "power4.inOut",
-        // immediateRender: true,
       },
-      // `-=${squaresVideoTiming}`
       0
     )
     .to(
@@ -118,31 +111,31 @@ function setListSectionScroll(
         duration: 0.5,
         overwrite: "auto",
         ease: "power4.inOut",
-        // immediateRender: true,
       },
-      // "-=0.5"
       0
     )
-    .to(squaresTitle, {
-      opacity: 0,
-      duration: 0.01,
-      overwrite: "auto",
-      stagger: {
-        from: "random",
-        each: 0.01,
+    .to(
+      squaresTitle,
+      {
+        opacity: 0,
+        duration: 0.01,
+        overwrite: "auto",
+        stagger: {
+          from: "random",
+          each: 0.01,
+        },
+        ease: "power4.inOut",
       },
-      ease: "bounce.out",
-      // immediateRender: true,
-    }, 0.5)
+      0.5
+    )
     .to(
       descriptionLines,
       {
-        yPercent: -100,
+        yPercent: -105,
         stagger: 0.02,
         duration: 0.5,
         overwrite: "auto",
         ease: "power4.inOut",
-        // immediateRender: true,
       },
       0.5
     )
@@ -153,10 +146,9 @@ function setListSectionScroll(
         duration: 0.5,
         overwrite: "auto",
         ease: "power4.inOut",
-        // immediateRender: true,
       },
       0.5
-  );
+    );
   
   tlContent.addPause(0.5);
   tlContent.addLabel('out', 0.5);
@@ -170,8 +162,7 @@ function setListSectionScroll(
         from: "random",
         each: 0.005,
       },
-      ease: "bounce.out",
-      // immediateRender: true,
+      ease: "power4.out",
     })
     .addPause()
     .addLabel('out')
@@ -183,44 +174,29 @@ function setListSectionScroll(
         from: "random",
         each: 0.005,
       },
-      ease: "bounce.out",
-      // immediateRender: true,
-    });  
+      ease: "power4.out",
+    }); 
   
-  let start, end;
-
-  if (isFirst) {
-    start = "top top";
-    end = "50% top";
-  } else if (isLast) {
-    start = "50% top";
-    end = "bottom bottom";
-  } else {
-    start = "33.33% top";
-    end = "66.66% top";
-  }
-
   gsap.timeline({
     scrollTrigger: {
       trigger,
       start: "top center",
       end: "bottom center",
-      // markers: true,
       scrub: true,
       fastScrollEnd: 500,
       preventOverlaps: "home-services",
       pin: false,
+      // markers: true,
       onEnter: () => {
         if (!isFirst) {
-          console.log("onEnter", anchorLink);
           tlContent.play();
           tlVideo.play();
+
           anchorLink.classList.add("active");
         }
       },
       onEnterBack: () => {
         if (!isLast) {
-          console.log('onEnterBack', anchorLink);
           tlContent.progress(1).reverse();
           tlVideo.progress(1).reverse();
           
@@ -229,18 +205,18 @@ function setListSectionScroll(
       },
       onLeave: () => {
         if (!isLast) {
-            console.log("OnLeave", anchorLink);
-            tlContent.seek("out").play();
-            tlVideo.seek("out").play();
+          tlContent.seek("out").play();
+          tlVideo.seek("out").play();
+
           anchorLink.classList.remove("active");
         }
       },
       onLeaveBack: () => {
         if (!isFirst) {
-            console.log("OnLeaveBack", anchorLink);
-            tlContent.seek("out").reverse();
-            tlVideo.seek("out").reverse();
-            anchorLink.classList.remove("active");
+          tlContent.seek("out").reverse();
+          tlVideo.seek("out").reverse();
+        
+          anchorLink.classList.remove("active");
         }
       },
     },

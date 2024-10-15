@@ -3,7 +3,9 @@ import { setLinesWrapper } from "../modules/setLinesWrapper";
 
 export function initServicesSectionScroll() {
   const wrapper = document.querySelector(".section.list-scroll"),
-    sections = wrapper.querySelectorAll(".sticky-wrapper"),
+    sections = wrapper.querySelectorAll(".section-list-scroll_inner"),
+    spacers = wrapper.querySelectorAll(".section-anchor"),
+    anchorLinks = wrapper.querySelectorAll(".section-nav-item"),
     numbers = wrapper.querySelector(".scroll-list-numbers-inner"),
     numbersLength = numbers ? numbers.querySelectorAll("div").length : null;
 
@@ -24,15 +26,22 @@ export function initServicesSectionScroll() {
         currentIndex = i;
       }
   }
+    console.log(anchorLinks);
 
   sections.forEach((section, i) => {
-    const id = section.querySelector('.section-anchor').id;
+    const id = section.dataset.section || null;
+    const trigger = spacers[i];
     const title = section.querySelector(".section-scroll-title > *"),
       descriptionEl = section.querySelector(".section-scroll-description"),
-      descriptionType = descriptionEl.classList.contains("is-masked") ? 'html': 'text',
-      anchorLink = wrapper.querySelector(
+      descriptionType = descriptionEl.classList.contains("is-masked") ? 'html' : 'text';
+    
+    let anchorLink;
+
+    if (anchorLinks) {
+      anchorLink = id ? wrapper.querySelector(
         `.section-nav-item[data-target="${id}"]`
-      );
+      ) : anchorLinks[i];
+    }
 
     let titleMaskEl, description;
 
@@ -57,7 +66,7 @@ export function initServicesSectionScroll() {
     }
 
     setListSectionScroll({
-      trigger: section,
+      trigger: trigger,
       isFirst: i === 0,
       isLast: i === sections.length - 1,
       titleMaskEl,
@@ -85,6 +94,8 @@ function setListSectionScroll(settings) {
     anchorLink,
     onComplete,
   } = settings;
+
+  console.log(settings);
   
   let squaresTitle, squaresDescription;
 
@@ -103,7 +114,7 @@ function setListSectionScroll(settings) {
     if (description.type === "html") {
       gsap.set(squaresDescription, { opacity: 0 });
     } else {
-      gsap.set(description.el, { yPercent: 100 });
+      gsap.set(description.el, { yPercent: 105 });
     }
 
   } else {
@@ -113,13 +124,16 @@ function setListSectionScroll(settings) {
     if (description.type === "html") {
       gsap.set(squaresDescription, { opacity: 1 });
     }
+
+    if (anchorLink) {
+      anchorLink.classList.add("active");
+    }
   }
-  const tlIn = gsap.timeline({ paused: true });
-  const tlOut = gsap.timeline({ paused: true });
+  const tl = gsap.timeline({ paused: true });
 
   if (!isFirst) {
     if (titleMaskEl) {
-      tlIn.to(
+      tl.to(
         squaresTitle,
         {
           opacity: 1,
@@ -128,30 +142,30 @@ function setListSectionScroll(settings) {
             from: "random",
             each: 0.01,
           },
-          ease: "bounce.out",
+          ease: "power4.inOut",
         },
         0
       );
     }
 
     if (description.type === "html") {
-      tlIn.to(
+      tl.to(
         squaresDescription,
         {
           opacity: 1,
-          duration: 0.01,
+          duration: 0.005,
           stagger: {
             from: "random",
-            each: 0.01,
+            each: 0.005,
           },
-          ease: "bounce.out",
+          ease: "power4.inOut",
         },
         0
       );
     }
 
     if (description.type === "text" && description.el) {
-      tlIn.to(
+      tl.to(
         description.el,
         {
           yPercent: 0,
@@ -165,103 +179,109 @@ function setListSectionScroll(settings) {
     }
   }
 
+  if (description.type === "html") {
+    tl.addPause(0.5);
+    tl.addLabel('out', 0.5);
+  }  
+
   if (titleMaskEl) {
-    tlOut.to(squaresTitle, {
+    tl.to(squaresTitle, {
       opacity: 0,
       duration: 0.01,
       stagger: {
         from: "random",
         each: 0.01,
       },
-      ease: "bounce.out",
-    });
+      ease: "power4.inOut",
+    }, 0.5);
   }
 
   if (description.type === "html") {
-    tlOut.to(squaresDescription, {
+    tl.to(squaresDescription, {
       opacity: 0,
-      duration: 0.01,
+      duration: 0.005,
       stagger: {
         from: "random",
-        each: 0.01,
+        each: 0.005,
       },
-      ease: "bounce.out",
-    });
+      ease: "power4.inOut",
+    }, 0.5);
   }
 
   if (description.type === "text" && description.el) {
-    tlOut.to(
+    tl.to(
       description.el,
       {
-        yPercent: -100,
+        yPercent: -105,
         stagger: 0.02,
         duration: 0.5,
         ease: "power4.inOut",
       },
-      0
+      0.5
     );
   }
 
-  let start, end;
-
-  if (isFirst) {
-    start = "top top";
-    end = "50% top";
-  } else if (isLast) {
-    start = "50% top";
-    end = "bottom bottom";
-  } else {
-    start = "33.33% top";
-    end = "66.66% top";
-  }
+  if (description.type !== "html") {
+    tl.addPause(0.5);
+    tl.addLabel("out", 0.5);
+  }  
 
   gsap.timeline({
     scrollTrigger: {
       trigger,
-      start,
-      end,
-      // markers: true,
+      start: "top center",
+      end: "bottom center",
       scrub: true,
+      fastScrollEnd: 500,
+      preventOverlaps: "scroll-list",
       pin: false,
+      // markers: true,
       onEnter: () => {
         if (!isFirst) {
-          tlIn.play();
+          tl.play();
           if (typeof onComplete === 'function') {
             onComplete();
           }
-        }
 
-        if (anchorLink) {
-          anchorLink.classList.add("active");
+          if (anchorLink) {
+            anchorLink.classList.add("active");
+          }
         }
       },
       onEnterBack: () => {
-        tlOut.reverse();
-        onComplete();
-        if (anchorLink) {
-          anchorLink.classList.add("active");
+        if (!isLast) {
+          tl.progress(1).reverse();
+          if (typeof onComplete === "function") {
+            onComplete();
+          }
+
+          if (anchorLink) {
+            anchorLink.classList.add("active");
+          }
         }
       },
       onLeave: () => {
         if (!isLast) {
-          tlOut.play();
+          tl.seek("out").play();
           if (typeof onComplete === "function") {
             onComplete();
           }
-        }
-        if (anchorLink) {
-          anchorLink.classList.remove("active");
+
+          if (anchorLink) {
+            anchorLink.classList.remove("active");
+          }
         }
       },
       onLeaveBack: () => {
         if (!isFirst) {
-          tlIn.reverse();
+          tl.seek("out").reverse();
           if (typeof onComplete === "function") {
             onComplete();
           }
-        }
-        if (anchorLink) {
-          anchorLink.classList.remove("active");
+
+          if (anchorLink) {
+            anchorLink.classList.remove("active");
+          }
         }
       },
     },

@@ -26,7 +26,7 @@ export function initServicesSectionScroll() {
         currentIndex = i;
       }
   }
-    console.log(anchorLinks);
+    // console.log(anchorLinks);
 
   sections.forEach((section, i) => {
     const id = section.dataset.section || null;
@@ -94,8 +94,6 @@ function setListSectionScroll(settings) {
     anchorLink,
     onComplete,
   } = settings;
-
-  console.log(settings);
   
   let squaresTitle, squaresDescription;
 

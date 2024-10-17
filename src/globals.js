@@ -13,20 +13,20 @@ import { setProteinStore } from "./modules/proteinCart";
 
 
 // wait until DOM is ready (html and svg markup)
+setLoadingStates();
 document.addEventListener("DOMContentLoaded", function() {
-  setLoadingStates();
   initMenus();
-  initButtonStates();
-  playVideoOnScroll();
-  setTransparentVideo();
-  setImageMasks();
-  setStaggerElements();
-  initFormSubmit();
-  initContactForm();
+  // initButtonStates();
+  // playVideoOnScroll();
+  // setTransparentVideo();
+  // setImageMasks();
+  // setStaggerElements();
+  // initFormSubmit();
+  // initContactForm();
   setVideosModal();
 });
 
-setProteinStore();
+//setProteinStore();
 
 document.fonts.ready.then(() => {
   setStaggerText();

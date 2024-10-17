@@ -20,8 +20,8 @@ function initMethodsList() {
     gsap.timeline({
       scrollTrigger: {
         trigger,
-        start: "center bottom",
-        end: "75% center",
+        start: "bottom bottom",
+        end: "bottom center",
         scrub: true,
         pin: false,
         markers: false,
@@ -81,7 +81,7 @@ function initMethodsList() {
     gsap.timeline({
       scrollTrigger: {
         trigger,
-        start: "center bottom",
+        start: "bottom bottom",
         end: "bottom center",
         scrub: true,
         pin: false,

@@ -1,5 +1,3 @@
-console.log('scrubImage');
-
 // Scrub animation ================================================ //
 const sections = gsap.utils.toArray("[scrub-wrapper]");
 const width = document.documentElement.clientWidth;

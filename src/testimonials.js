@@ -161,6 +161,7 @@ function transitionSlides(current, next, index, total, direction, names, namesHe
     {
       opacity: 1,
       duration: 0.01,
+      overwrite: true,
       stagger: {
         each: 0.01,
         // grid: "auto",
@@ -175,17 +176,18 @@ function transitionSlides(current, next, index, total, direction, names, namesHe
   gsap.fromTo(
     currentSquares,
     {
-      opacity: 1
+      opacity: 1,
     },
     {
       opacity: 0,
       duration: 0.01,
+      overwrite: true,
       stagger: {
         each: 0.01,
         // grid: "auto",
         // from: "center"
-        from: "random"
-      }
+        from: "random",
+      },
       // ease: "expo.out",
     }
   );

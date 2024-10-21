@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
   initMenus();
   initButtonStates();
   playVideoOnScroll();
-  setTransparentVideo();
+  // setTransparentVideo();
   setImageMasks();
   setStaggerElements();
   initFormSubmit();

@@ -23,7 +23,12 @@ export function setTeamMembers() {
     const videoTl = setVideoModal(modal);
 
     let player;
-    if (typeof Vimeo !== "undefined") {
+    console.log(
+      typeof Vimeo !== "undefined",
+      modal.dataset.video,
+      isVimeoEmbedUrl(modal.dataset.video)
+    );
+    if (typeof Vimeo !== "undefined" && isVimeoEmbedUrl(modal.dataset.video)) {
       player = new Vimeo.Player(modal.querySelector("iframe"));
       videoTl.eventCallback("onComplete", () => {
         player.play();
@@ -252,4 +257,10 @@ async function openModal(tl) {
 
 function closeModal(tl) {
   tl.reverse();
+}
+
+function isVimeoEmbedUrl(url) {
+  const vimeoEmbedPattern =
+    /^https:\/\/player\.vimeo\.com\/video\/\d+([?#].*)?$/;
+  return vimeoEmbedPattern.test(url);
 }

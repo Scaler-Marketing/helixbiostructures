@@ -14,7 +14,6 @@ import { setProteinStore } from "./modules/proteinCart";
 
 // wait until DOM is ready (html and svg markup)
 document.addEventListener("DOMContentLoaded", function() {
-  setLoadingStates();
   initMenus();
   initButtonStates();
   playVideoOnScroll();
@@ -31,4 +30,5 @@ setProteinStore();
 document.fonts.ready.then(() => {
   setStaggerText();
   setStaggerHeading();
+  setLoadingStates();
 });

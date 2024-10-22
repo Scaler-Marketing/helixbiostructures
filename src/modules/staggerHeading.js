@@ -1,4 +1,4 @@
-import { createSVGGrid } from "./createSVGGrid";
+import { createSVGGrid } from "./createSVGGrid.js";
 
 // Link timelines to scroll position
 function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
@@ -9,6 +9,8 @@ function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
     trigger: triggerElement,
     scrub: true,
     start,
+    fastScrollEnd: 500,
+    preventOverlaps: "scroll-headings",
   };
 
   if (!withScroll) {
@@ -17,12 +19,15 @@ function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
         opacity: 1,
         delay: delay,
         duration: 0.01,
-        overwrite: "auto",
+        overwrite: true,
         stagger: {
           each: 0.01,
           from: "random",
         },
-        ease: "bounce.out"
+        ease: "bounce.out",
+        onComplete: () => {
+          gsap.set(triggerElement.parentNode, { maskImage: "none" });
+        }
       });
     };
 
@@ -36,7 +41,7 @@ function createScrollTrigger(triggerElement, start, end, delay, withScroll) {
       .to(squares, {
         opacity: 1,
         duration: 0.01,
-        overwrite: "auto",
+        overwrite: true,
         stagger: {
           each: 0.01,
           from: "random",

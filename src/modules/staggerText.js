@@ -6,6 +6,8 @@ function createScrollTrigger(triggerElement, elements, start, end, stagger, dela
     trigger: triggerElement,
     scrub: true,
     start,
+    fastScrollEnd: 500,
+    preventOverlaps: "scroll-text",
   };
 
   if (!withScroll) {

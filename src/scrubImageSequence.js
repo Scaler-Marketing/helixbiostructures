@@ -3,25 +3,25 @@ const sections = gsap.utils.toArray("[scrub-wrapper]");
 const width = document.documentElement.clientWidth;
 const height = window.innerHeight;
 
-var mm = gsap.matchMedia();
+const mm = gsap.matchMedia();
 
 // Image sequence play on scroll =====================================//
 
-var allImagesCount = 0;
-var totalCount = 0;
+let allImagesCount = 0;
+let totalCount = 0;
 
 // Initialize for each section
 function initSections() {
   sections.forEach(function (section) {
-    var prefix = section.dataset.prefix || null;
-    var suffix = section.dataset.suffix || null;
-    var frames = section.dataset.framecount || 0;
-    var canvas = section.querySelector("canvas");
+    const prefix = section.dataset.prefix || null;
+    const suffix = section.dataset.suffix || null;
+    const frames = section.dataset.framecount || 0;
+    const canvas = section.querySelector("canvas");
     if (!canvas || !prefix || !suffix || !frames) {
       return;
     }
 
-    var device = width >= 768 ? "desktop" : "mobile";
+    const device = width >= 768 ? "desktop" : "mobile";
 
     allImagesCount += Number(frames);
     totalCount += Number(frames);
@@ -39,18 +39,12 @@ mm.add("(max-width: 767px)", () => {
   initSections();
 });
 
-//var $loadingNum = $('.loading-number');
-//var $loadingProgress = $('.loading-number-progress');
 function updateImageSequenceCount(file) {
   allImagesCount--;
 
   var updatedPercent = 100 - Math.round((allImagesCount * 100) / totalCount);
-  //$loadingNum.text(updatedPercent + '%');
-  //$loadingProgress.css('transform', 'translate3d(' + updatedPercent +'%, 0,0)');
-  // console.log(updatedPercent);
 
   if (allImagesCount === 0) {
-    //$('.loading-disable').click();
     setTimeout(function () {
       lenis.resize();
     }, 500);
@@ -81,7 +75,9 @@ function initCanvas(section, canvas, prefix, suffix, frames, device) {
 
     img.onload = function () {
       updateImageSequenceCount(imgSrc);
-      if (allImagesCount === 0) {
+      // console.log(allImagesCount, imgSrc, i);
+      // if (allImagesCount === 0) {
+      if (allImagesCount === totalCount - 1) {
         initCanvasAnimations(section, images, context, canvas);
       }
     };

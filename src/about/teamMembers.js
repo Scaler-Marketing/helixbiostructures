@@ -22,11 +22,34 @@ export function setTeamMembers() {
     const tl = setModal(modal);
     const videoTl = setVideoModal(modal);
 
+    let player;
+    console.log(
+      typeof Vimeo !== "undefined",
+      modal.dataset.video,
+      isVimeoEmbedUrl(modal.dataset.video)
+    );
+    if (typeof Vimeo !== "undefined" && isVimeoEmbedUrl(modal.dataset.video)) {
+      player = new Vimeo.Player(modal.querySelector("iframe"));
+      videoTl.eventCallback("onComplete", () => {
+        player.play();
+      });
+      videoTl.eventCallback("onReverseComplete", () => {
+        player.setCurrentTime(0);
+      });
+    }
+
     trigger.addEventListener('click', () => openModal(tl));
     close.addEventListener('click', () => closeModal(tl));
 
-    videoThumb.addEventListener("click", () => openModal(videoTl));
-    videoClose.addEventListener("click", () => closeModal(videoTl));
+    videoThumb.addEventListener("click", () => {
+      openModal(videoTl);
+    });
+    videoClose.addEventListener("click", () => {
+      if (player) {
+        player.pause();
+      }
+      closeModal(videoTl);
+    });
 
     const modalCloseCircles = close.querySelectorAll('svg circle'),
       videoCloseCircles = videoClose.querySelectorAll('svg circle');
@@ -234,4 +257,10 @@ async function openModal(tl) {
 
 function closeModal(tl) {
   tl.reverse();
+}
+
+function isVimeoEmbedUrl(url) {
+  const vimeoEmbedPattern =
+    /^https:\/\/player\.vimeo\.com\/video\/\d+([?#].*)?$/;
+  return vimeoEmbedPattern.test(url);
 }

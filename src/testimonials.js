@@ -161,6 +161,7 @@ function transitionSlides(current, next, index, total, direction, names, namesHe
     {
       opacity: 1,
       duration: 0.01,
+      overwrite: true,
       stagger: {
         each: 0.01,
         // grid: "auto",
@@ -175,17 +176,18 @@ function transitionSlides(current, next, index, total, direction, names, namesHe
   gsap.fromTo(
     currentSquares,
     {
-      opacity: 1
+      opacity: 1,
     },
     {
       opacity: 0,
       duration: 0.01,
+      overwrite: true,
       stagger: {
         each: 0.01,
         // grid: "auto",
         // from: "center"
-        from: "random"
-      }
+        from: "random",
+      },
       // ease: "expo.out",
     }
   );
@@ -197,15 +199,6 @@ function transitionSlides(current, next, index, total, direction, names, namesHe
     y: `${yNames}rem`,
     duration: 0.5,
     ease: "expo.out",
-    onComplete: () => {
-      // if (index === 0 && direction === "prev") {
-      //   gsap.set(names, { y: `${(total - 1) * 2}rem` });
-      // }
-
-      // if (index === total && direction === "next") {
-      //   gsap.set(names, { y: "0rem" });
-      // }
-    },
   });
 
   // companies list
@@ -214,21 +207,12 @@ function transitionSlides(current, next, index, total, direction, names, namesHe
     y: `${yCompanies}rem`,
     duration: 0.5,
     ease: "expo.out",
-    onComplete: () => {
-      // if (index === 0 && direction === "prev") {
-      //   gsap.set(names, { y: `${(total - 1) * companiesHeight}rem` });
-      // }
-
-      // if (index === total && direction === "next") {
-      //   gsap.set(names, { y: "0rem" });
-      // }
-    },
   });
 }
 
 function calculateYPosition(index, total, direction, height) {
   if (index === 0 && direction === 'prev') {
-    return -1 * height;
+    return 0;
   }
 
   if (index === total && direction === 'next') {

@@ -16,8 +16,26 @@ export function setVideosModal() {
     const close = modal.querySelector(".video-player-full_modal-close");
     const tl = setVideoModal(modal);
 
-    trigger.addEventListener("click", () => openModal(tl));
-    close.addEventListener("click", () => closeModal(tl));
+    let player;
+    if (typeof Vimeo !== "undefined") {
+      player = new Vimeo.Player(modal.querySelector('iframe'));
+      tl.eventCallback("onComplete", () => {
+        player.play();
+      });
+      tl.eventCallback("onReverseComplete", () => {
+        player.setCurrentTime(0);
+      });
+    }
+    
+    trigger.addEventListener("click", () => {
+      openModal(tl)
+    });
+    close.addEventListener("click", () => {
+      if (player) {
+        player.pause();
+      }
+      closeModal(tl)
+    });
 
     const modalCloseCircles = close.querySelectorAll("svg circle");
 

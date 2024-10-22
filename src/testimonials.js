@@ -21,8 +21,10 @@ function initTestimonials() {
 
   sliderContent.forEach((content) => {
     const maskedEl = createSVGGrid(content, 10);
-    const squares = maskedEl.querySelectorAll('rect');
-
+    const squares = maskedEl.querySelectorAll('rect'),
+      parent = maskedEl.parentNode,
+      maskImageId = parent.style.maskImage;
+    
     const slideTl = gsap.timeline({ paused: true });
     // next slide
     slideTl.fromTo(
@@ -40,11 +42,18 @@ function initTestimonials() {
           // from: "center"
           from: "random",
         },
+        onComplete: () => {
+          gsap.set(parent, { maskImage: "none" });
+        }
         // ease: "expo.out",
       }
     );
 
-    slides.push(slideTl);
+    slides.push({
+      tl: slideTl,
+      parent,
+      id: maskImageId
+    });
   });
 
   // gsap.set(".testimonial-item svg rect", {
@@ -54,7 +63,7 @@ function initTestimonials() {
   //   opacity: 1
   // });
 
-  slides[0].progress(1);
+  slides[0].tl.progress(1);
 
   // clone last and first item from each name and company
   const allNames = names.querySelectorAll(".testimonial-source"),
@@ -177,11 +186,12 @@ function initTestimonials() {
 }
 
 function transitionSlides(current, next, index, total, direction, names, namesHeight, companies, companiesHeight) {
-  console.log(current, next);
-  current.eventCallback("onReverseComplete", () => {
-    next.play();
+  // console.log(current, next);
+  current.tl.eventCallback("onReverseComplete", () => {
+    next.tl.play();
   });
-  current.reverse();
+  gsap.set(current.parent, { maskImage: current.id });
+  current.tl.reverse();
 
   // names list
   const yNames = calculateYPosition(index, total, direction, namesHeight);

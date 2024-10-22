@@ -1,6 +1,8 @@
 import { createSVGGrid } from "./modules/createSVGGrid";
 import { getElementHeightInRem } from "./modules/getHeight";
 
+let slides = [];
+
 function initTestimonials() {
   // Variables
   const wrapper = document.querySelector('.testimonials-wrapper'),
@@ -18,15 +20,41 @@ function initTestimonials() {
   let currentIndex = 0;
 
   sliderContent.forEach((content) => {
-    createSVGGrid(content, 10);
+    const maskedEl = createSVGGrid(content, 10);
+    const squares = maskedEl.querySelectorAll('rect');
+
+    const slideTl = gsap.timeline({ paused: true });
+    // next slide
+    slideTl.fromTo(
+      squares,
+      {
+        opacity: 0,
+      },
+      {
+        opacity: 1,
+        duration: 0.005,
+        overwrite: true,
+        stagger: {
+          each: 0.005,
+          // grid: "auto",
+          // from: "center"
+          from: "random",
+        },
+        // ease: "expo.out",
+      }
+    );
+
+    slides.push(slideTl);
   });
 
-  gsap.set(".testimonial-item svg rect", {
-    opacity: 0
-  });
-  gsap.set(".testimonial-item:first-child svg rect", {
-    opacity: 1
-  });
+  // gsap.set(".testimonial-item svg rect", {
+  //   opacity: 0
+  // });
+  // gsap.set(".testimonial-item:first-child svg rect", {
+  //   opacity: 1
+  // });
+
+  slides[0].progress(1);
 
   // clone last and first item from each name and company
   const allNames = names.querySelectorAll(".testimonial-source"),
@@ -73,15 +101,15 @@ function initTestimonials() {
 
   // Next button click
   nextButton.addEventListener("click", () => {
-    let currentSlide = sliderContent[currentIndex];
-    if (currentIndex < sliderContent.length - 1) {
-      let nextSlide = sliderContent[currentIndex + 1];
+    let currentSlide = slides[currentIndex];
+    if (currentIndex < slides.length - 1) {
+      let nextSlide = slides[currentIndex + 1];
 
       transitionSlides(
         currentSlide,
         nextSlide,
         currentIndex + 1,
-        sliderContent.length - 1,
+        slides.length - 1,
         "next",
         names,
         namesHeight,
@@ -91,13 +119,13 @@ function initTestimonials() {
 
       currentIndex++;
     } else {
-      let nextSlide = sliderContent[0];
+      let nextSlide = slides[0];
 
       transitionSlides(
         currentSlide,
         nextSlide,
         0,
-        sliderContent.length - 1,
+        slides.length - 1,
         'next',
         names,
         namesHeight,
@@ -111,15 +139,15 @@ function initTestimonials() {
 
   // Prev button click
   prevButton.addEventListener("click", () => {
-    let currentSlide = sliderContent[currentIndex];
+    let currentSlide = slides[currentIndex];
     if (currentIndex > 0) {
-      let prevSlide = sliderContent[currentIndex - 1];
+      let prevSlide = slides[currentIndex - 1];
 
       transitionSlides(
         currentSlide,
         prevSlide,
         currentIndex - 1,
-        sliderContent.length - 1,
+        slides.length - 1,
         "prev",
         names,
         namesHeight,
@@ -129,13 +157,13 @@ function initTestimonials() {
 
       currentIndex--;
     } else {
-      let prevSlide = sliderContent[sliderContent.length - 1];
+      let prevSlide = slides[slides.length - 1];
 
       transitionSlides(
         currentSlide,
         prevSlide,
-        sliderContent.length - 1,
-        sliderContent.length - 1,
+        slides.length - 1,
+        slides.length - 1,
         "prev",
         names,
         namesHeight,
@@ -149,48 +177,11 @@ function initTestimonials() {
 }
 
 function transitionSlides(current, next, index, total, direction, names, namesHeight, companies, companiesHeight) {
-  const currentSquares = current.parentNode.querySelectorAll('rect'),
-    nextSquares = next.parentNode.querySelectorAll('rect');
-    
-  // next slide
-  gsap.fromTo(
-    nextSquares,
-    {
-      opacity: 0
-    },
-    {
-      opacity: 1,
-      duration: 0.01,
-      overwrite: true,
-      stagger: {
-        each: 0.01,
-        // grid: "auto",
-        // from: "center"
-        from: "random"
-      }
-      // ease: "expo.out",
-    }
-  );
-
-  // current slide
-  gsap.fromTo(
-    currentSquares,
-    {
-      opacity: 1,
-    },
-    {
-      opacity: 0,
-      duration: 0.01,
-      overwrite: true,
-      stagger: {
-        each: 0.01,
-        // grid: "auto",
-        // from: "center"
-        from: "random",
-      },
-      // ease: "expo.out",
-    }
-  );
+  console.log(current, next);
+  current.eventCallback("onReverseComplete", () => {
+    next.play();
+  });
+  current.reverse();
 
   // names list
   const yNames = calculateYPosition(index, total, direction, namesHeight);

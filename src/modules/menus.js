@@ -3,7 +3,7 @@ import { getElementHeightInRem } from "./getHeight";
 export function initMenus() {
   let mm = gsap.matchMedia();
   // add a media query. When it matches, the associated function will run
-  mm.add("(min-width: 992px)", () => {
+  mm.add("(min-width: 768px)", () => {
     const nav = document.querySelector(".header .nav"),
       dropdowns = nav.querySelectorAll(".nav-dropdown-trigger-wrapper"),
       dropdownEl = nav.querySelector(".nav-dropdown-el.desktop"),

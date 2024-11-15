@@ -98,7 +98,7 @@ export function initMenus() {
     });
   });
 
-  mm.add("(max-width: 991px)", () => {
+  mm.add("(max-width: 767px)", () => {
 
     const nav = document.querySelector(".header .nav"),
       mobileTrigger = document.querySelector(".mobile-trigger"),

@@ -1,5 +1,5 @@
-import { createSVGGrid } from "../modules/createSVGGrid";
-import { setLinesWrapper } from "../modules/setLinesWrapper";
+import { createSVGGrid } from "../modules/createSVGGrid.js";
+import { setLinesWrapper } from "../modules/setLinesWrapper.js";
 
 export function initServicesSectionScroll() {
   const wrapper = document.querySelector(".section.list-scroll"),

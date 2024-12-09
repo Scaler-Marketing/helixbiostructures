@@ -23,11 +23,11 @@ export function setTeamMembers() {
     const videoTl = setVideoModal(modal);
 
     let player;
-    console.log(
-      typeof Vimeo !== "undefined",
-      modal.dataset.video,
-      isVimeoEmbedUrl(modal.dataset.video)
-    );
+    // console.log(
+    //   typeof Vimeo !== "undefined",
+    //   modal.dataset.video,
+    //   isVimeoEmbedUrl(modal.dataset.video)
+    // );
     if (typeof Vimeo !== "undefined" && isVimeoEmbedUrl(modal.dataset.video)) {
       player = new Vimeo.Player(modal.querySelector("iframe"));
       videoTl.eventCallback("onComplete", () => {

@@ -32,6 +32,8 @@ function createScrollList(
 export function setStaggerElements() {
   const list = document.querySelectorAll("[stagger-list]");
 
+  console.log(list);
+
   if (!list) {
     return;
   }

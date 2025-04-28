@@ -112,3 +112,17 @@ function initMethodsList() {
 if (window.innerWidth > 768) {
   initMethodsList();    
 }
+
+window.fsAttributes = window.fsAttributes || [];
+window.fsAttributes.push([
+  "cmsfilter",
+  (filterInstances) => {
+    // The callback passes a `filterInstances` array with all the `CMSFilters` instances on the page.
+    const [filterInstance] = filterInstances;
+
+    // The `renderitems` event runs whenever the list renders items after filtering.
+    filterInstance.listInstance.on("renderitems", (renderedItems) => {
+      ScrollTrigger.refresh(true);
+    });
+  },
+]);

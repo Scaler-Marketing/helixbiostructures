@@ -11,6 +11,24 @@ import { initContactForm } from "./modules/contactForm";
 import { setVideosModal } from "./modules/videoModal";
 import { setProteinStore } from "./modules/proteinCart";
 
+window.addEventListener("beforeunload", () => {
+  // console.log("beforeunload");
+  setLoadingStates();
+});
+
+window.addEventListener("popstate", () => {
+  // console.log("popstate");
+  setLoadingStates();
+});
+
+document.addEventListener("pageshow", (event) => {
+  // console.log("pageshow", event);
+  // Check if the page was restored from the bfcache
+  if (event.persisted) {
+    // Re-run your loading animation
+    setLoadingStates();
+  }
+});
 
 // wait until DOM is ready (html and svg markup)
 document.addEventListener("DOMContentLoaded", function() {
@@ -23,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
   initFormSubmit();
   initContactForm();
   setVideosModal();
+  setLoadingStates();
 });
 
 setProteinStore();
@@ -30,5 +49,4 @@ setProteinStore();
 document.fonts.ready.then(() => {
   setStaggerText();
   setStaggerHeading();
-  setLoadingStates();
 });

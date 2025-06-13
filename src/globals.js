@@ -13,12 +13,12 @@ import { setProteinStore } from "./modules/proteinCart";
 
 window.addEventListener("beforeunload", () => {
   // console.log("beforeunload");
-  setLoadingStates();
+  setAll();
 });
 
 window.addEventListener("popstate", () => {
   // console.log("popstate");
-  setLoadingStates();
+  setAll();
 });
 
 document.addEventListener("pageshow", (event) => {
@@ -26,12 +26,17 @@ document.addEventListener("pageshow", (event) => {
   // Check if the page was restored from the bfcache
   if (event.persisted) {
     // Re-run your loading animation
-    setLoadingStates();
+    setAll();
   }
 });
 
 // wait until DOM is ready (html and svg markup)
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
+  // console.log("DOMContentLoaded");
+  setAll();
+});
+
+function setAll() {
   initMenus();
   initButtonStates();
   playVideoOnScroll();
@@ -42,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
   initContactForm();
   setVideosModal();
   setLoadingStates();
-});
+}
 
 setProteinStore();
 

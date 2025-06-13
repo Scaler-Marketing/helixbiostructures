@@ -61,10 +61,13 @@ export function setVideosModal() {
 }
 
 function setVideoModal(modal) {
+  const videoPlayer = modal.querySelector(".video-player-full_video");
   const videoClose = modal.querySelector(".video-player-full_modal-close");
+  const backdrop = modal.querySelector(".video-player-full_modal-backdrop");
 
   gsap.set(modal, { visibility: "hidden", backdropFilter: "blur(0px)" });
   gsap.set(videoClose, { scale: 0 });
+  gsap.set(videoPlayer, { clipPath: "inset(50%)" });
 
   const tl = gsap.timeline({ paused: true });
 

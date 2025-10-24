@@ -6,7 +6,7 @@
 // ========================================
 const FORM_CONFIG = {
   // Worker URL
-  workerUrl: "https://helix-form-worker-debug.revolv3.workers.dev/",
+  workerUrl: "https://helix-form-worker.revolv3.workers.dev/",
 
   // Form Selectors & Attributes
   formSelector: "form[cf-form]",

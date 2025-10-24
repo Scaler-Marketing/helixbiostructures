@@ -6,7 +6,7 @@
 // ========================================
 const FORM_CONFIG = {
   // Worker URL
-  workerUrl: "https://helix-form-worker.revolv3.workers.dev/",
+  workerUrl: "https://helix-form-worker-debug.revolv3.workers.dev/",
 
   // Form Selectors & Attributes
   formSelector: "form[cf-form]",
@@ -121,6 +121,7 @@ class CloudflareTurnstileHandler {
     // Setup Turnstile and form submission
     this.loadTurnstile(() => this.renderTurnstile(config));
     this.setupFormSubmission(config);
+    this.setupAutoResetOnEdit(config);
   }
 
   setupHoneypot(config) {
@@ -151,14 +152,14 @@ class CloudflareTurnstileHandler {
 
     // Make it invisible but accessible to screen readers
     honeypotField.style.cssText = `
-      position: absolute !important;
-      left: -9999px !important;
-      top: -9999px !important;
-      width: 1px !important;
-      height: 1px !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-    `;
+        position: absolute !important;
+        left: -9999px !important;
+        top: -9999px !important;
+        width: 1px !important;
+        height: 1px !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      `;
 
     // Add aria-hidden for screen readers
     honeypotField.setAttribute("aria-hidden", "true");
@@ -301,8 +302,8 @@ class CloudflareTurnstileHandler {
       );
     }
 
-    // Render Turnstile widget
-    window.turnstile.render(turnstileContainer, {
+    // Render Turnstile widget and store the widget ID
+    config.turnstileWidgetId = window.turnstile.render(turnstileContainer, {
       sitekey: config.siteKey,
       callback: (token) => {
         config.turnstileToken = token;
@@ -319,6 +320,13 @@ class CloudflareTurnstileHandler {
       "expired-callback": () => {
         config.turnstileToken = null;
         this.disableSubmitButton(config);
+        this.showError(
+          config,
+          "Security verification expired. Please complete the verification again."
+        );
+        console.log(
+          `Turnstile widget ${config.turnstileWidgetId} expired for form ${config.formId}`
+        );
       },
       theme: FORM_CONFIG.turnstileTheme,
       size: FORM_CONFIG.turnstileSize,
@@ -351,6 +359,47 @@ class CloudflareTurnstileHandler {
       },
       true
     ); // Use capture phase
+  }
+
+  setupAutoResetOnEdit(config) {
+    // Auto-clear errors when user starts editing after an error
+    // Track error state per form
+    config.hasErrorShown = false;
+
+    // Add input listeners to form fields
+    const formInputs = config.formElement.querySelectorAll(
+      "input, textarea, select"
+    );
+    formInputs.forEach((input) => {
+      // Skip the Turnstile and honeypot inputs
+      if (
+        input.getAttribute("data-honeypot") === "true" ||
+        input.closest(".cf-turnstile-container")
+      ) {
+        return;
+      }
+
+      // Clear errors when user starts editing
+      input.addEventListener("input", () => {
+        if (config.hasErrorShown) {
+          this.hideError(config);
+          config.hasErrorShown = false;
+          console.log(
+            `Auto-cleared error for form ${config.formId} after user started editing`
+          );
+        }
+      });
+
+      input.addEventListener("focus", () => {
+        if (config.hasErrorShown) {
+          this.hideError(config);
+          config.hasErrorShown = false;
+          console.log(
+            `Auto-cleared error for form ${config.formId} after user focused on input`
+          );
+        }
+      });
+    });
   }
 
   async handleFormSubmit(config) {
@@ -519,14 +568,48 @@ class CloudflareTurnstileHandler {
   }
 
   resetTurnstileOnError(config) {
-    if (window.turnstile) {
-      // Reset the Turnstile widget to generate a new token
-      window.turnstile.reset();
+    if (window.turnstile && config.turnstileWidgetId !== undefined) {
+      // Reset the specific Turnstile widget to generate a new token
+      window.turnstile.reset(config.turnstileWidgetId);
 
       // Clear the current token and disable submit button
       config.turnstileToken = null;
       this.disableSubmitButton(config);
+
+      console.log(
+        `Turnstile widget ${config.turnstileWidgetId} reset for form ${config.formId}`
+      );
+    } else if (window.turnstile) {
+      // Fallback: reset all widgets if widget ID is not available
+      window.turnstile.reset();
+      config.turnstileToken = null;
+      this.disableSubmitButton(config);
+
+      console.log(`Turnstile reset (fallback) for form ${config.formId}`);
     }
+  }
+
+  // Public method to manually reset Turnstile for a specific form (useful for testing/debugging)
+  resetTurnstileForForm(formId) {
+    const config = this.forms.find((f) => f.formId === formId);
+    if (config) {
+      this.hideError(config); // Clear any existing errors
+      this.resetTurnstileOnError(config);
+      console.log(`Manually reset Turnstile for form: ${formId}`);
+      return true;
+    } else {
+      console.warn(`Form with ID "${formId}" not found`);
+      return false;
+    }
+  }
+
+  // Public method to reset all Turnstile widgets (useful for testing)
+  resetAllTurnstileWidgets() {
+    this.forms.forEach((config) => {
+      this.hideError(config);
+      this.resetTurnstileOnError(config);
+    });
+    console.log(`Reset all ${this.forms.length} Turnstile widgets`);
   }
 
   enableSubmitButton(config) {
@@ -568,6 +651,9 @@ class CloudflareTurnstileHandler {
 
       // Remove hide class to show error
       config.errorElement.classList.remove(FORM_CONFIG.hideClass);
+
+      // Track that error has been shown for auto-clear functionality
+      config.hasErrorShown = true;
     }
   }
 
@@ -576,6 +662,9 @@ class CloudflareTurnstileHandler {
     if (config.errorElement) {
       // Add hide class to hide error
       config.errorElement.classList.add(FORM_CONFIG.hideClass);
+
+      // Reset error tracking flag
+      config.hasErrorShown = false;
     }
   }
 
@@ -600,9 +689,15 @@ class CloudflareTurnstileHandler {
       parent = parent.parentElement;
     }
 
-    // Reset Turnstile
-    if (window.turnstile) {
+    // Reset Turnstile widget to allow resubmission
+    if (window.turnstile && config.turnstileWidgetId !== undefined) {
+      window.turnstile.reset(config.turnstileWidgetId);
+      console.log(
+        `Turnstile widget ${config.turnstileWidgetId} reset after successful submission`
+      );
+    } else if (window.turnstile) {
       window.turnstile.reset();
+      console.log(`Turnstile reset (fallback) after successful submission`);
     }
     config.turnstileToken = null;
     this.disableSubmitButton(config);
@@ -629,5 +724,20 @@ class CloudflareTurnstileHandler {
   }
 }
 
-// Initialize when page loads
-new CloudflareTurnstileHandler();
+// Initialize when page loads and make it globally accessible for testing
+window.turnstileHandler = new CloudflareTurnstileHandler();
+
+// Add global helper functions for easy testing
+window.resetTurnstile = (formId) => {
+  if (formId) {
+    return window.turnstileHandler.resetTurnstileForForm(formId);
+  } else {
+    window.turnstileHandler.resetAllTurnstileWidgets();
+    return true;
+  }
+};
+
+// Log helper message for developers
+console.log(
+  "Turnstile Handler initialized. Use resetTurnstile() or resetTurnstile('formId') to reset widgets during testing."
+);

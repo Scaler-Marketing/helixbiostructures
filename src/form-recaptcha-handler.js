@@ -1,4 +1,4 @@
-// Cloudflare Turnstile Form Handler - Production Version
+// Cloudflare Worker Form Handler (Webflow Intercept) - Production Version
 // Automatically detects forms with cf-form attribute and processes them
 
 // ========================================
@@ -6,12 +6,11 @@
 // ========================================
 const FORM_CONFIG = {
   // Worker URL
-  workerUrl: "https://helix-form-worker.revolv3.workers.dev/",
+  workerUrl: "https://helix-form-worker-debug.revolv3.workers.dev/",
 
   // Form Selectors & Attributes
   formSelector: "form[cf-form]",
   formIdAttribute: "cf-form",
-  siteKeyAttribute: "cf-turnstile-sitekey",
   formUrlAttribute: "cf-form-url",
   redirectUrlAttribute: "cf-redirect-url",
 
@@ -25,11 +24,6 @@ const FORM_CONFIG = {
 
   // CSS Classes
   hideClass: "hide",
-  turnstileContainerClass: "cf-turnstile-container",
-
-  // Turnstile Settings
-  turnstileTheme: "light",
-  turnstileSize: "normal",
 
   // Loading Text
   loadingText: "Sending...",
@@ -60,28 +54,180 @@ const FORM_CONFIG = {
     enabled: true,
     fieldName: "Page URL", // The name attribute for the hidden field
   },
+
+  // UTM/Tracking Parameter Persistence
+  trackingParams: {
+    enabled: true,
+    allowPatterns: [/^utm_/i, /^gad_/i, /^gclid$/i, /^fbclid$/i], // Patterns for allowed parameters
+    sessionStorageKey: "persistQS", // Key for sessionStorage
+  },
 };
 
-class CloudflareTurnstileHandler {
+class CloudflareFormHandler {
   constructor() {
     this.forms = [];
     this.workerUrl = FORM_CONFIG.workerUrl;
+    this.initTrackingPersistence();
     this.init();
   }
 
-  init() {
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => this.setupForms());
-    } else {
-      this.setupForms();
+  initTrackingPersistence() {
+    if (!FORM_CONFIG.trackingParams.enabled) {
+      return;
     }
+
+    // Prevent duplicate initialization (similar to your existing script)
+    if (window.__persistQS_init) return;
+    window.__persistQS_init = true;
+
+    console.log("Initializing tracking parameter persistence");
+
+    // Helper function to check if a parameter is allowed
+    const isAllowed = (key) => {
+      return FORM_CONFIG.trackingParams.allowPatterns.some((pattern) =>
+        pattern.test(key)
+      );
+    };
+
+    // Filter and keep only allowed parameters
+    const filterAllowed = (queryString) => {
+      const src = new URLSearchParams(queryString);
+      const out = new URLSearchParams();
+      src.forEach((value, key) => {
+        if (isAllowed(key)) {
+          out.set(key, value);
+        }
+      });
+      return out.toString();
+    };
+
+    // Get current URL parameters
+    const incoming = window.location.search.slice(1);
+    const filtered = filterAllowed(incoming);
+
+    // Save filtered parameters to sessionStorage
+    if (filtered) {
+      sessionStorage.setItem(
+        FORM_CONFIG.trackingParams.sessionStorageKey,
+        filtered
+      );
+      console.log("Saved tracking parameters to sessionStorage:", filtered);
+    }
+
+    // Set up link parameter merging (for navigation)
+    this.setupLinkParameterMerging();
+  }
+
+  setupLinkParameterMerging() {
+    const persisted = sessionStorage.getItem(
+      FORM_CONFIG.trackingParams.sessionStorageKey
+    );
+    if (!persisted) return;
+
+    // Merge tracking params into a link without removing its own params
+    const mergeQuery = (href) => {
+      try {
+        const url = new URL(href, window.location.origin);
+        if (
+          url.origin !== window.location.origin ||
+          !/^https?:$/i.test(url.protocol)
+        ) {
+          return href;
+        }
+
+        const target = url.searchParams;
+        const src = new URLSearchParams(persisted);
+
+        src.forEach((val, key) => {
+          if (!target.has(key)) {
+            target.set(key, val);
+          }
+        });
+
+        url.search = target.toString();
+        return url.toString();
+      } catch (e) {
+        return href;
+      }
+    };
+
+    // Find closest anchor element
+    const closestAnchor = (el) => {
+      while (el && el !== document && el.nodeType === 1) {
+        if (el.tagName === "A" && el.hasAttribute("href")) return el;
+        el = el.parentNode;
+      }
+      return null;
+    };
+
+    // Handle click events to merge parameters
+    const handleClick = (ev) => {
+      const a = closestAnchor(ev.target);
+      if (!a) return;
+
+      const href = a.getAttribute("href");
+      if (
+        !href ||
+        href.startsWith("#") ||
+        href.startsWith("mailto:") ||
+        href.startsWith("tel:") ||
+        href.startsWith("javascript:")
+      )
+        return;
+
+      const merged = mergeQuery(href);
+      if (merged !== href) {
+        a.setAttribute("href", merged);
+      }
+    };
+
+    // Add event listeners for link clicks
+    document.addEventListener("click", handleClick, true);
+    document.addEventListener("auxclick", handleClick, true);
+  }
+
+  init() {
+    const start = () => this.setupForms();
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () =>
+        this.waitForWebflow(start)
+      );
+    } else {
+      this.waitForWebflow(start);
+    }
+  }
+
+  waitForWebflow(callback) {
+    // We want to run AFTER Webflow initializes but BEFORE their form handlers
+    // So we'll use a short delay after Webflow is ready
+    const runCallback = () => {
+      // Small delay to let Webflow finish its initialization
+      setTimeout(callback, 100);
+    };
+
+    if (window.Webflow && typeof window.Webflow.push === "function") {
+      window.Webflow.push(runCallback);
+      return;
+    }
+
+    if (Array.isArray(window.Webflow)) {
+      window.Webflow.push(runCallback);
+      return;
+    }
+
+    // Fallback: run with delay if Webflow isn't available
+    setTimeout(callback, 100);
   }
 
   setupForms() {
     // Find all forms with cf-form attribute
     const formElements = document.querySelectorAll(FORM_CONFIG.formSelector);
 
+    console.log(`Found ${formElements.length} forms with cf-form attribute`);
+
     formElements.forEach((formElement) => {
+      console.log("Setting up form:", formElement.getAttribute("cf-form"));
       this.setupSingleForm(formElement);
     });
   }
@@ -90,7 +236,6 @@ class CloudflareTurnstileHandler {
     // Extract configuration from custom attributes
     const config = {
       formId: formElement.getAttribute(FORM_CONFIG.formIdAttribute),
-      siteKey: formElement.getAttribute(FORM_CONFIG.siteKeyAttribute),
       formUrl: formElement.getAttribute(FORM_CONFIG.formUrlAttribute),
       redirectUrl: formElement.getAttribute(FORM_CONFIG.redirectUrlAttribute),
       formElement: formElement,
@@ -98,13 +243,15 @@ class CloudflareTurnstileHandler {
       submitLabel: formElement.querySelector(FORM_CONFIG.submitLabelSelector),
       errorElement: formElement.querySelector(FORM_CONFIG.errorElementSelector),
       errorText: formElement.querySelector(FORM_CONFIG.errorTextSelector),
-      turnstileToken: null,
     };
 
     // Validate required attributes
-    if (!config.siteKey || !config.formUrl) {
+    if (!config.formUrl) {
+      console.warn(`Form ${config.formId} missing cf-form-url attribute`);
       return;
     }
+
+    console.log(`Setting up form ${config.formId} with URL: ${config.formUrl}`);
 
     // Store form config
     this.forms.push(config);
@@ -118,8 +265,10 @@ class CloudflareTurnstileHandler {
     // Setup Page URL field
     this.setupPageUrlField(config);
 
-    // Setup Turnstile and form submission
-    this.loadTurnstile(() => this.renderTurnstile(config));
+    // Setup tracking parameters
+    this.setupTrackingParams(config);
+
+    // Setup Webflow intercept submission
     this.setupFormSubmission(config);
     this.setupAutoResetOnEdit(config);
   }
@@ -272,93 +421,186 @@ class CloudflareTurnstileHandler {
     );
   }
 
-  loadTurnstile(callback) {
-    if (!window.turnstile) {
-      const script = document.createElement("script");
-      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
-      script.async = true;
-      script.defer = true;
-      script.onload = callback;
-      document.head.appendChild(script);
-    } else {
-      callback();
+  setupTrackingParams(config) {
+    if (!FORM_CONFIG.trackingParams.enabled) {
+      return;
     }
-  }
 
-  renderTurnstile(config) {
-    // Create container for Turnstile widget
-    let turnstileContainer = config.formElement.querySelector(
-      `.${FORM_CONFIG.turnstileContainerClass}`
+    console.log("Setting up tracking parameters for form:", config.formId);
+
+    // Get persisted tracking parameters from sessionStorage
+    const persistedParams = sessionStorage.getItem(
+      FORM_CONFIG.trackingParams.sessionStorageKey
     );
-    if (!turnstileContainer) {
-      turnstileContainer = document.createElement("div");
-      turnstileContainer.className = FORM_CONFIG.turnstileContainerClass;
-      turnstileContainer.style.marginBottom = "20px";
 
-      // Insert before submit button
-      config.submitButton.parentNode.insertBefore(
-        turnstileContainer,
-        config.submitButton
-      );
+    if (!persistedParams) {
+      console.log("No persisted tracking parameters found");
+      return;
     }
 
-    // Render Turnstile widget and store the widget ID
-    config.turnstileWidgetId = window.turnstile.render(turnstileContainer, {
-      sitekey: config.siteKey,
-      callback: (token) => {
-        config.turnstileToken = token;
-        this.enableSubmitButton(config);
-      },
-      "error-callback": () => {
-        config.turnstileToken = null;
-        this.disableSubmitButton(config);
-        this.showError(
-          config,
-          "Security verification failed. Please try again."
+    console.log("Found persisted tracking parameters:", persistedParams);
+
+    // Parse the persisted parameters
+    const urlParams = new URLSearchParams(persistedParams);
+    const trackingFields = [];
+
+    // Create hidden fields for each tracking parameter
+    urlParams.forEach((value, key) => {
+      // Check if this parameter matches our allowed patterns
+      const isAllowed = FORM_CONFIG.trackingParams.allowPatterns.some(
+        (pattern) => pattern.test(key)
+      );
+
+      if (isAllowed) {
+        // Check if field already exists
+        const existingField = config.formElement.querySelector(
+          `input[name="${key}"]`
         );
-      },
-      "expired-callback": () => {
-        config.turnstileToken = null;
-        this.disableSubmitButton(config);
-        this.showError(
-          config,
-          "Security verification expired. Please complete the verification again."
+        if (existingField) {
+          console.log(`Tracking field ${key} already exists, skipping`);
+          return;
+        }
+
+        // Create hidden field for this tracking parameter
+        const trackingField = document.createElement("input");
+        trackingField.type = "hidden";
+        trackingField.name = key;
+        trackingField.value = value;
+        trackingField.setAttribute("data-tracking-param", "true");
+
+        // Insert at the beginning of the form
+        config.formElement.insertBefore(
+          trackingField,
+          config.formElement.firstChild
         );
-        console.log(
-          `Turnstile widget ${config.turnstileWidgetId} expired for form ${config.formId}`
-        );
-      },
-      theme: FORM_CONFIG.turnstileTheme,
-      size: FORM_CONFIG.turnstileSize,
+
+        trackingFields.push({ key, value });
+        console.log(`Added tracking parameter: ${key} = ${value}`);
+      }
     });
 
-    // Initially disable submit button
-    this.disableSubmitButton(config);
+    console.log(`Added ${trackingFields.length} tracking parameters to form`);
   }
 
   setupFormSubmission(config) {
-    config.formElement.addEventListener("submit", (e) => {
+    console.log(
+      "Setting up form submission interception for form:",
+      config.formId
+    );
+
+    // Completely disable Webflow's form handling
+    config.formElement.removeAttribute("action");
+    config.formElement.removeAttribute("method");
+    config.formElement.setAttribute("data-wf-ignore", "true");
+
+    // Store original form data for restoration if needed
+    const originalAction = config.formElement.getAttribute("action");
+    const originalMethod = config.formElement.getAttribute("method");
+
+    // Add multiple event listeners to catch all submission attempts
+    const handleSubmit = (event) => {
+      console.log("Form submission intercepted:", event.type, event);
+
+      // Always prevent default behavior
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
       // Let native validation run first
       if (!config.formElement.checkValidity()) {
-        return; // Let browser show validation errors
+        console.log("Form validation failed, letting browser handle");
+        config.formElement.reportValidity();
+        return false;
       }
 
-      // Form is valid, now intercept
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
+      // Check if reCAPTCHA is completed (Webflow's reCAPTCHA)
+      const recaptchaResponse = config.formElement.querySelector(
+        'textarea[name="g-recaptcha-response"]'
+      );
+      if (recaptchaResponse && !recaptchaResponse.value) {
+        console.log("reCAPTCHA not completed, showing error");
+        this.showError(config, "Please complete the reCAPTCHA verification.");
+        return false;
+      }
 
+      console.log(
+        "All validations passed, proceeding with custom form submission"
+      );
       this.handleFormSubmit(config);
-    });
+      return false;
+    };
 
-    // Also prevent any other form submission events
-    config.formElement.addEventListener(
-      "submit",
-      (e) => {
-        e.preventDefault();
-      },
-      true
-    ); // Use capture phase
+    // Add event listeners with capture phase to intercept early
+    config.formElement.addEventListener("submit", handleSubmit, true);
+    config.formElement.addEventListener("submit", handleSubmit, false);
+
+    // Also intercept button clicks directly
+    if (config.submitButton) {
+      console.log("Setting up submit button interception");
+
+      // Remove any existing Webflow click handlers by cloning the button
+      const newButton = config.submitButton.cloneNode(true);
+      config.submitButton.parentNode.replaceChild(
+        newButton,
+        config.submitButton
+      );
+      config.submitButton = newButton;
+
+      config.submitButton.addEventListener(
+        "click",
+        (event) => {
+          console.log("Submit button clicked, intercepting");
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+
+          // Manually trigger form validation and submission
+          if (config.formElement.checkValidity()) {
+            // Check reCAPTCHA
+            const recaptchaResponse = config.formElement.querySelector(
+              'textarea[name="g-recaptcha-response"]'
+            );
+            if (recaptchaResponse && recaptchaResponse.value) {
+              console.log(
+                "Button click: all validations passed, proceeding with custom submission"
+              );
+              this.handleFormSubmit(config);
+            } else {
+              console.log("Button click: reCAPTCHA not completed");
+              this.showError(
+                config,
+                "Please complete the reCAPTCHA verification."
+              );
+            }
+          } else {
+            console.log("Button click: form validation failed");
+            config.formElement.reportValidity();
+          }
+
+          return false;
+        },
+        true
+      );
+
+      // Also add a regular event listener as backup
+      config.submitButton.addEventListener(
+        "click",
+        (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
+        },
+        false
+      );
+    }
+
+    // Disable any Webflow form success/error handling
+    const webflowDone =
+      config.formElement.parentElement?.querySelector(".w-form-done");
+    const webflowFail =
+      config.formElement.parentElement?.querySelector(".w-form-fail");
+    if (webflowDone) webflowDone.style.display = "none";
+    if (webflowFail) webflowFail.style.display = "none";
   }
 
   setupAutoResetOnEdit(config) {
@@ -371,11 +613,8 @@ class CloudflareTurnstileHandler {
       "input, textarea, select"
     );
     formInputs.forEach((input) => {
-      // Skip the Turnstile and honeypot inputs
-      if (
-        input.getAttribute("data-honeypot") === "true" ||
-        input.closest(".cf-turnstile-container")
-      ) {
+      // Skip the honeypot inputs
+      if (input.getAttribute("data-honeypot") === "true") {
         return;
       }
 
@@ -406,12 +645,6 @@ class CloudflareTurnstileHandler {
     // Clear any previous errors
     this.hideError(config);
 
-    // Validate Turnstile token
-    if (!config.turnstileToken) {
-      this.showError(config, "Please complete the security verification.");
-      return;
-    }
-
     // Set loading state
     this.setSubmitButtonLoading(config, true);
 
@@ -430,7 +663,6 @@ class CloudflareTurnstileHandler {
       };
 
       const payload = {
-        turnstileToken: config.turnstileToken,
         formData: formData,
         formUrl: config.formUrl, // Tell worker where to forward
         redirectUrl: config.redirectUrl,
@@ -450,18 +682,12 @@ class CloudflareTurnstileHandler {
       if (result.success) {
         this.handleSuccess(config);
       } else {
-        // Reset Turnstile on error to generate new token
-        this.resetTurnstileOnError(config);
-
         this.showError(
           config,
           result.error?.message || "Something went wrong. Please try again."
         );
       }
     } catch (error) {
-      // Reset Turnstile on error to generate new token
-      this.resetTurnstileOnError(config);
-
       this.showError(
         config,
         "Network error. Please check your connection and try again."
@@ -567,65 +793,6 @@ class CloudflareTurnstileHandler {
     }
   }
 
-  resetTurnstileOnError(config) {
-    if (window.turnstile && config.turnstileWidgetId !== undefined) {
-      // Reset the specific Turnstile widget to generate a new token
-      window.turnstile.reset(config.turnstileWidgetId);
-
-      // Clear the current token and disable submit button
-      config.turnstileToken = null;
-      this.disableSubmitButton(config);
-
-      console.log(
-        `Turnstile widget ${config.turnstileWidgetId} reset for form ${config.formId}`
-      );
-    } else if (window.turnstile) {
-      // Fallback: reset all widgets if widget ID is not available
-      window.turnstile.reset();
-      config.turnstileToken = null;
-      this.disableSubmitButton(config);
-
-      console.log(`Turnstile reset (fallback) for form ${config.formId}`);
-    }
-  }
-
-  // Public method to manually reset Turnstile for a specific form (useful for testing/debugging)
-  resetTurnstileForForm(formId) {
-    const config = this.forms.find((f) => f.formId === formId);
-    if (config) {
-      this.hideError(config); // Clear any existing errors
-      this.resetTurnstileOnError(config);
-      console.log(`Manually reset Turnstile for form: ${formId}`);
-      return true;
-    } else {
-      console.warn(`Form with ID "${formId}" not found`);
-      return false;
-    }
-  }
-
-  // Public method to reset all Turnstile widgets (useful for testing)
-  resetAllTurnstileWidgets() {
-    this.forms.forEach((config) => {
-      this.hideError(config);
-      this.resetTurnstileOnError(config);
-    });
-    console.log(`Reset all ${this.forms.length} Turnstile widgets`);
-  }
-
-  enableSubmitButton(config) {
-    if (config.submitButton) {
-      config.submitButton.disabled = false;
-      config.submitButton.style.opacity = "1";
-    }
-  }
-
-  disableSubmitButton(config) {
-    if (config.submitButton) {
-      config.submitButton.disabled = true;
-      config.submitButton.style.opacity = "0.6";
-    }
-  }
-
   setSubmitButtonLoading(config, loading) {
     if (!config.submitButton) return;
 
@@ -689,19 +856,6 @@ class CloudflareTurnstileHandler {
       parent = parent.parentElement;
     }
 
-    // Reset Turnstile widget to allow resubmission
-    if (window.turnstile && config.turnstileWidgetId !== undefined) {
-      window.turnstile.reset(config.turnstileWidgetId);
-      console.log(
-        `Turnstile widget ${config.turnstileWidgetId} reset after successful submission`
-      );
-    } else if (window.turnstile) {
-      window.turnstile.reset();
-      console.log(`Turnstile reset (fallback) after successful submission`);
-    }
-    config.turnstileToken = null;
-    this.disableSubmitButton(config);
-
     // Redirect if specified (with a small delay to ensure form stays visible)
     if (config.redirectUrl) {
       const redirectUrl = this.buildRedirectUrl(config.redirectUrl);
@@ -725,19 +879,12 @@ class CloudflareTurnstileHandler {
 }
 
 // Initialize when page loads and make it globally accessible for testing
-window.turnstileHandler = new CloudflareTurnstileHandler();
-
-// Add global helper functions for easy testing
-window.resetTurnstile = (formId) => {
-  if (formId) {
-    return window.turnstileHandler.resetTurnstileForForm(formId);
-  } else {
-    window.turnstileHandler.resetAllTurnstileWidgets();
-    return true;
-  }
-};
+const formSecurityHandler = new CloudflareFormHandler();
+window.formSecurityHandler = formSecurityHandler;
+window.turnstileHandler = formSecurityHandler; // Backwards compatibility
 
 // Log helper message for developers
 console.log(
-  "Turnstile Handler initialized. Use resetTurnstile() or resetTurnstile('formId') to reset widgets during testing."
+  "Form Security Handler initialized. Webflow submissions will be intercepted and forwarded to the Cloudflare Worker."
 );
+

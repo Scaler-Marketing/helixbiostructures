@@ -6,7 +6,7 @@
 // ========================================
 const FORM_CONFIG = {
   // Worker URL
-  workerUrl: "https://helix-form-worker-debug.revolv3.workers.dev/",
+  workerUrl: "https://helix-form-worker.revolv3.workers.dev/",
 
   // Form Selectors & Attributes
   formSelector: "form[cf-form]",
@@ -301,14 +301,14 @@ class CloudflareFormHandler {
 
     // Make it invisible but accessible to screen readers
     honeypotField.style.cssText = `
-        position: absolute !important;
-        left: -9999px !important;
-        top: -9999px !important;
-        width: 1px !important;
-        height: 1px !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-      `;
+          position: absolute !important;
+          left: -9999px !important;
+          top: -9999px !important;
+          width: 1px !important;
+          height: 1px !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
+        `;
 
     // Add aria-hidden for screen readers
     honeypotField.setAttribute("aria-hidden", "true");
@@ -652,6 +652,23 @@ class CloudflareFormHandler {
       // Collect form data
       const formData = this.collectFormData(config);
 
+      // Capture Webflow's reCAPTCHA token for verification/forwarding
+      const recaptchaField = config.formElement.querySelector(
+        'textarea[name="g-recaptcha-response"]'
+      );
+      const recaptchaToken = recaptchaField?.value?.trim();
+
+      if (recaptchaToken) {
+        console.log(
+          `[cf-form:${config.formId}] Captured reCAPTCHA token:`,
+          recaptchaToken
+        );
+      } else {
+        console.warn(
+          `[cf-form:${config.formId}] Unable to find reCAPTCHA token before submission`
+        );
+      }
+
       // Add metadata for spam detection
       formData.metadata = {
         submissionTime: Date.now(),
@@ -666,6 +683,7 @@ class CloudflareFormHandler {
         formData: formData,
         formUrl: config.formUrl, // Tell worker where to forward
         redirectUrl: config.redirectUrl,
+        recaptchaToken,
       };
 
       // Submit to Cloudflare Worker
@@ -887,4 +905,3 @@ window.turnstileHandler = formSecurityHandler; // Backwards compatibility
 console.log(
   "Form Security Handler initialized. Webflow submissions will be intercepted and forwarded to the Cloudflare Worker."
 );
-

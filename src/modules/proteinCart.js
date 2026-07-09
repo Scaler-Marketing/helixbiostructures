@@ -15,8 +15,13 @@ function setStoreItems(list) {
 }
 
 function initPurchaseForm(store) {
-  const formTrigger = document.querySelector(".purchase-form_trigger"),
-    formTriggerHeight = getElementHeightInRem(formTrigger),
+  const formTrigger = document.querySelector(".purchase-form_trigger");
+
+  if (!formTrigger) {
+    return;
+  }
+
+  const formTriggerHeight = getElementHeightInRem(formTrigger),
     formClose = document.querySelector(".purchase-form_close"),
     formCloseCircles = formClose.querySelectorAll("circle"),
     form = document.querySelector(".purchase-form"),
